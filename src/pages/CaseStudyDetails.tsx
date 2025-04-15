@@ -9,13 +9,38 @@ import PieChart from '@/components/charts/PieChart';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
+// Define the proper types for our case study
+interface CaseStudyDetailProps {
+  title: string;
+  description: string;
+  metrics: {
+    [key: string]: string;
+  };
+  detailedReport?: {
+    sentimentData?: Array<{ name: string; value: number; color: string; }>;
+    languageBreakdown?: Array<{ name: string; value: number; color: string; }>;
+    timeSeriesData?: Array<{ time: string; mentions: number; }>;
+    locationData?: Array<{ name: string; value: number; color: string; }>;
+    mentionsTimeline?: Array<{ time: string; mentions: number; }>;
+    timeline?: Array<{ time: string; event: string; }>;
+    topKeywords?: string[];
+    verificationStatus?: string;
+    influencers?: Array<{ 
+      name: string; 
+      followers: string; 
+      engagementRate: number; 
+      avatar: string; 
+    }>;
+  };
+}
+
 const CaseStudyDetails = () => {
   const location = useLocation();
-  const [caseStudy, setCaseStudy] = useState<any>(null);
+  const [caseStudy, setCaseStudy] = useState<CaseStudyDetailProps | null>(null);
 
   useEffect(() => {
     if (location.state?.caseStudy) {
-      setCaseStudy(location.state.caseStudy);
+      setCaseStudy(location.state.caseStudy as CaseStudyDetailProps);
     }
   }, [location]);
 
@@ -76,7 +101,7 @@ const CaseStudyDetails = () => {
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                   <h4 className="text-xl font-semibold mb-4">التسلسل الزمني للأحداث</h4>
                   <div className="space-y-4">
-                    {caseStudy.detailedReport.timeline.map((item: any, index: number) => (
+                    {caseStudy.detailedReport.timeline.map((item, index) => (
                       <div key={index} className="border-r-2 border-saudi-green pr-4">
                         <div className="text-saudi-green font-semibold">{item.time}</div>
                         <div className="text-gray-600">{item.event}</div>
@@ -108,7 +133,7 @@ const CaseStudyDetails = () => {
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                   <h4 className="text-xl font-semibold mb-4">الكلمات الأكثر تداولاً</h4>
                   <div className="flex flex-wrap gap-2">
-                    {caseStudy.detailedReport.topKeywords.map((keyword: string, index: number) => (
+                    {caseStudy.detailedReport.topKeywords.map((keyword, index) => (
                       <span key={index} className="px-3 py-1 bg-gray-100 rounded-full text-gray-700">
                         {keyword}
                       </span>
@@ -123,7 +148,7 @@ const CaseStudyDetails = () => {
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                   <h4 className="text-xl font-semibold mb-4">أبرز المؤثرين في النقاش</h4>
                   <div className="space-y-4">
-                    {caseStudy.detailedReport.influencers.map((influencer: any, index: number) => (
+                    {caseStudy.detailedReport.influencers.map((influencer, index) => (
                       <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
                         <img 
                           src={influencer.avatar} 
