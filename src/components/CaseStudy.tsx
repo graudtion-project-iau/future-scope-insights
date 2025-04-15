@@ -22,6 +22,12 @@ interface CaseStudyProps {
     timeline?: Array<{ time: string; event: string; }>;
     topKeywords?: string[];
     verificationStatus?: string;
+    influencers?: Array<{ 
+      name: string; 
+      followers: string; 
+      engagementRate: number; 
+      avatar: string; 
+    }>;
   };
 }
 
