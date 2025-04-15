@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, BarChart3, Globe2, Users, ChevronDown, Bell, Mail, Shield, Search } from 'lucide-react';
+import { MessageSquare, BarChart3, Globe2, Users, Bell, Mail, Shield, Search } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
@@ -14,39 +14,6 @@ const Index = () => {
   const handleExampleClick = (query: string) => {
     navigate(`/results?q=${encodeURIComponent(query)}`);
   };
-
-  const teamMembers = [
-    {
-      name: "حاتم العتيبي",
-      role: "Full Stack & AI Engineer",
-      description: "مطور متكامل مع خبرة في الذكاء الاصطناعي. ساهم في تطوير واجهة المستخدم والخلفية، مع تخصص في هندسة عكسية لـ Twitter API وتقنيات استخراج البيانات.",
-      image: "/team/hatem.jpg"
-    },
-    {
-      name: "عمر الصحفي",
-      role: "AI Engineer",
-      description: "مهندس ذكاء اصطناعي متخصص في تطوير خوارزميات التعلم الآلي ومعالجة اللغات الطبيعية لتحليل وفهم المحتوى عبر منصات التواصل الاجتماعي.",
-      image: "/team/omar.jpg"
-    },
-    {
-      name: "مشاري التميمي",
-      role: "Data Engineer",
-      description: "خبير في تحليل البيانات وتطوير خطوط معالجة البيانات. متخصص في بناء أنظمة معالجة البيانات الضخمة وتحويلها إلى رؤى قابلة للتنفيذ.",
-      image: "/team/meshari.jpg"
-    },
-    {
-      name: "عبدالرحمن",
-      role: "Data Analyst",
-      description: "متخصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
-      image: "/team/abdulrahman.jpg"
-    },
-    {
-      name: "نايف الصحفي",
-      role: "Design Engineer",
-      description: "مهندس تصميم وواجهة أمامية، متخصص في إنشاء تجارب مستخدم جذابة وسلسة مع التركيز على التصميم التفاعلي.",
-      image: "/team/naif.jpg"
-    }
-  ];
 
   const caseStudies = [
     {
@@ -75,7 +42,17 @@ const Index = () => {
           { time: '12h', mentions: 1500000 },
           { time: '24h', mentions: 2500000 }
         ],
-        topKeywords: ['تاريخي', 'إنجاز', 'فخر', 'أبطال', 'معجزة']
+        topKeywords: ['تاريخي', 'إنجاز', 'فخر', 'أبطال', 'معجزة'],
+        timeline: [
+          { time: "قبل المباراة", event: "80% من التوقعات تشير لفوز الأرجنتين" },
+          { time: "الشوط الأول", event: "تسجيل هدفين للسعودية" },
+          { time: "نهاية المباراة", event: "فوز تاريخي للسعودية 2-1" }
+        ],
+        influencers: [
+          { name: "محمد السهلاوي", followers: "1.2M", engagementRate: 8.5, avatar: "https://randomuser.me/api/portraits/men/1.jpg" },
+          { name: "عبدالله المالكي", followers: "800K", engagementRate: 7.2, avatar: "https://randomuser.me/api/portraits/men/2.jpg" },
+          { name: "سارة الودعاني", followers: "650K", engagementRate: 6.8, avatar: "https://randomuser.me/api/portraits/women/1.jpg" }
+        ]
       }
     },
     {
@@ -103,8 +80,45 @@ const Index = () => {
           { time: '19:00', mentions: 150 },
           { time: '19:15', mentions: 75 }
         ],
-        verificationStatus: "تم التأكد: مناورة تدريبية عسكرية"
+        verificationStatus: "تم التأكد: مناورة تدريبية عسكرية",
+        influencers: [
+          { name: "فهد المطيري", followers: "500K", engagementRate: 5.5, avatar: "https://randomuser.me/api/portraits/men/3.jpg" },
+          { name: "نورة السعد", followers: "300K", engagementRate: 4.8, avatar: "https://randomuser.me/api/portraits/women/2.jpg" }
+        ]
       }
+    }
+  ];
+
+  const teamMembers = [
+    {
+      name: "حاتم العتيبي",
+      role: "Full Stack & AI Engineer",
+      description: "مطور متكامل مع خبرة في الذكاء الاصطناعي. ساهم في تطوير واجهة المستخدم والخلفية، مع تخصص في هندسة عكسية لـ Twitter API وتقنيات استخراج البيانات.",
+      image: "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    {
+      name: "عمر الصحفي",
+      role: "AI Engineer",
+      description: "مهندس ذكاء اصطناعي متخصص في تطوير خوارزميات التعلم الآلي ومعالجة اللغات الطبيعية لتحليل وفهم المحتوى عبر منصات التواصل الاجتماعي.",
+      image: "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    {
+      name: "مشاري التميمي",
+      role: "Data Engineer",
+      description: "خبير في تحليل البيانات وتطوير خطوط معالجة البيانات. متخصص في بناء أنظمة معالجة البيانات الضخمة وتحويلها إلى رؤى قابلة للتنفيذ.",
+      image: "https://randomuser.me/api/portraits/men/3.jpg"
+    },
+    {
+      name: "عبدالرحمن",
+      role: "Data Analyst",
+      description: "متخصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
+      image: "https://randomuser.me/api/portraits/men/4.jpg"
+    },
+    {
+      name: "نايف الصحفي",
+      role: "Design Engineer",
+      description: "مهندس تصميم وواجهة أمامية، متخصص في إنشاء تجارب مستخدم جذابة وسلسة مع التركيز على التصميم التفاعلي.",
+      image: "https://randomuser.me/api/portraits/men/5.jpg"
     }
   ];
 
@@ -116,8 +130,8 @@ const Index = () => {
         <div className="absolute inset-0 z-0">
           <div className="absolute animate-float opacity-10 top-20 right-10 text-6xl">🔍</div>
           <div className="absolute animate-float opacity-10 bottom-20 left-10 text-6xl" style={{ animationDelay: "1s" }}>📊</div>
-          <div className="absolute animate-float opacity-10 top-40 left-1/4 text-6xl" style={{ animationDelay: "1.5s" }}>📱</div>
-          <div className="absolute animate-float opacity-10 bottom-40 right-1/4 text-6xl" style={{ animationDelay: "2s" }}>💡</div>
+          <div className="absolute animate-float opacity-10 top-40 left-1/4 text-6xl" style={{ animationDelay: "1.5s" }}>⚡</div>
+          <div className="absolute animate-float opacity-10 bottom-40 right-1/4 text-6xl" style={{ animationDelay: "2s" }}>🔔</div>
         </div>
         
         <div className="container mx-auto relative z-10">
@@ -186,23 +200,10 @@ const Index = () => {
       
       <section className="py-16 bg-gray-50 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-center heading-gradient">
-            فريق التطوير - جامعة الإمام عبدالرحمن بن فيصل
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <TeamMember key={index} {...member} />
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      <section className="py-16 bg-white px-4">
-        <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 heading-gradient">المميزات الرئيسية</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              توفر منصة FutureVision مجموعة واسعة من الأدوات التحليلية المبتكرة لمساعدتك على فهم العالم الرقمي
+              نقدم مجموعة شاملة من الأدوات التحليلية المبتكرة لمراقبة وتحليل المحتوى بذكاء وفعالية
             </p>
           </div>
           
@@ -212,23 +213,23 @@ const Index = () => {
                 <MessageSquare className="w-6 h-6 text-saudi-green" />
               </div>
               <h3 className="text-xl font-semibold mb-2">تحليل المشاعر</h3>
-              <p className="text-gray-600">تعرف على مشاعر الجمهور وآرائهم من خلال تحليل دقيق للمحتوى</p>
+              <p className="text-gray-600">تحليل ذكي للمشاعر في أكثر من 50 لغة مع دقة عالية</p>
             </div>
             
             <div className="dashboard-card animate-scale-in" style={{ animationDelay: '0.1s' }}>
               <div className="bg-saudi-green/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                <BarChart3 className="w-6 h-6 text-saudi-green" />
+                <Mail className="w-6 h-6 text-saudi-green" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">تحليل الاتجاهات</h3>
-              <p className="text-gray-600">راقب الاتجاهات الناشئة والموضوعات الشائعة في الزمن الحقيقي</p>
+              <h3 className="text-xl font-semibold mb-2">تنبيهات فورية</h3>
+              <p className="text-gray-600">إشعارات فورية عبر البريد والواتساب للأحداث المهمة</p>
             </div>
             
             <div className="dashboard-card animate-scale-in" style={{ animationDelay: '0.2s' }}>
               <div className="bg-saudi-green/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                <Globe2 className="w-6 h-6 text-saudi-green" />
+                <Shield className="w-6 h-6 text-saudi-green" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">تغطية عالمية</h3>
-              <p className="text-gray-600">استفد من تحليل البيانات بأكثر من 50 لغة من مختلف أنحاء العالم</p>
+              <h3 className="text-xl font-semibold mb-2">تحقق من الأخبار</h3>
+              <p className="text-gray-600">التحقق السريع من صحة الأخبار ومصادرها</p>
             </div>
             
             <div className="dashboard-card animate-scale-in" style={{ animationDelay: '0.3s' }}>
@@ -236,21 +237,9 @@ const Index = () => {
                 <Users className="w-6 h-6 text-saudi-green" />
               </div>
               <h3 className="text-xl font-semibold mb-2">تحليل المؤثرين</h3>
-              <p className="text-gray-600">تعرف على أهم المؤثرين وتأثيرهم على المحادثات والاتجاهات</p>
+              <p className="text-gray-600">تحديد وتحليل تأثير الشخصيات المؤثرة</p>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <section className="py-16 bg-saudi-green text-white px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">ابدأ رحلتك مع FutureVision اليوم</h2>
-          <p className="text-white/80 max-w-2xl mx-auto mb-8">
-            انضم إلى آلاف العملاء الذين يستخدمون منصتنا للحصول على رؤى قيمة من بيانات و��ائل التواصل الاجتماعي
-          </p>
-          <Button className="bg-white text-saudi-green hover:bg-saudi-gold hover:text-white transition-all px-8 py-6 text-lg rounded-full shadow-lg">
-            سجل الآن مجاناً
-          </Button>
         </div>
       </section>
       
@@ -259,42 +248,53 @@ const Index = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 heading-gradient">الأسئلة الشائعة</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              إليك إجابات على بعض الأسئلة الأكثر شيوعاً حول منصة FutureVision
+              إجابات على الأسئلة الأكثر شيوعاً حول خدماتنا
             </p>
           </div>
           
           <div className="max-w-3xl mx-auto">
             <div className="space-y-4">
-              <div className="dashboard-card cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">كيف يمكنني البدء باستخدام المنصة؟</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
+              {[
+                {
+                  q: "كيف يمكنني البدء باستخدام المنصة؟",
+                  a: "ببساطة قم بإنشاء حساب جديد مجاني، وابدأ في استكشاف البيانات والتحليلات المتاحة."
+                },
+                {
+                  q: "ما هي مصادر البيانات التي تعتمد عليها المنصة؟",
+                  a: "نجمع البيانات من مختلف منصات التواصل الاجتماعي مثل X، Reddit، Meta، وGoogle Search."
+                },
+                {
+                  q: "كم عدد اللغات المدعومة في المنصة؟",
+                  a: "تدعم منصتنا أكثر من 50 لغة عالمية، مما يتيح تحليل المحتوى من مختلف الثقافات."
+                },
+                {
+                  q: "كيف يتم إرسال التنبيهات؟",
+                  a: "نرسل تنبيهات فورية عبر البريد الإلكتروني والواتساب للأحداث المهمة التي تهمك."
+                },
+                {
+                  q: "ما مدى دقة التحليلات؟",
+                  a: "نستخدم خوارزميات متقدمة للذكاء الاصطناعي تحقق دقة تصل إلى 95% في تحليل المشاعر والمحتوى."
+                }
+              ].map((faq, index) => (
+                <div key={index} className="dashboard-card transition-all hover:shadow-md">
+                  <button className="w-full text-left">
+                    <h3 className="text-lg font-semibold">{faq.q}</h3>
+                    <p className="mt-2 text-gray-600">{faq.a}</p>
+                  </button>
                 </div>
-                <div className="mt-2 text-gray-600">
-                  ببساطة قم بإنشاء حساب جديد، واختر الخطة المناسبة، ثم ابدأ البحث واستكشاف البيانات والرؤى التحليلية.
-                </div>
-              </div>
-              
-              <div className="dashboard-card cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">ما هي مصادر البيانات التي تعتمد عليها المنصة؟</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
-                </div>
-                <div className="mt-2 text-gray-600">
-                  تجمع منصتنا البيانات من مختلف منصات التواصل الاجتماعي مثل X، Reddit، Meta، وGoogle Search، مما يضمن تغطية شاملة.
-                </div>
-              </div>
-              
-              <div className="dashboard-card cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">كم عدد اللغات المدعومة في المنصة؟</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
-                </div>
-                <div className="mt-2 text-gray-600">
-                  تدعم منصتنا أكثر من 50 لغة حول العالم، مما يتيح لك تحليل المحتوى والحصول على رؤى من مختلف الثقافات واللغات.
-                </div>
-              </div>
+              ))}
             </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="py-16 bg-white px-4">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-6">فريق التطوير - جامعة الإمام عبدالرحمن بن فيصل</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {teamMembers.map((member, index) => (
+              <TeamMember key={index} {...member} />
+            ))}
           </div>
         </div>
       </section>

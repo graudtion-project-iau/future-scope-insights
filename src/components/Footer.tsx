@@ -9,21 +9,21 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Future<span className="text-saudi-gold">Vision</span></h3>
+            <h3 className="text-xl font-bold mb-4">Future<span className="text-white">Vision</span></h3>
             <p className="text-white/80 mb-4">
               منصة مبتكرة لمراقبة الحياة الواقعية عبر محتوى وسائل التواصل الاجتماعي، تقدم رؤى ذكية وتحليل دلالي ومؤشرات أداء رئيسية
             </p>
             <div className="flex space-x-4">
-              <Link to="#" className="text-white hover:text-saudi-gold transition-colors">
+              <Link to="#" className="text-white hover:text-white/80 transition-colors">
                 <Twitter size={20} />
               </Link>
-              <Link to="#" className="text-white hover:text-saudi-gold transition-colors">
+              <Link to="#" className="text-white hover:text-white/80 transition-colors">
                 <Facebook size={20} />
               </Link>
-              <Link to="#" className="text-white hover:text-saudi-gold transition-colors">
+              <Link to="#" className="text-white hover:text-white/80 transition-colors">
                 <Instagram size={20} />
               </Link>
-              <Link to="#" className="text-white hover:text-saudi-gold transition-colors">
+              <Link to="#" className="text-white hover:text-white/80 transition-colors">
                 <Linkedin size={20} />
               </Link>
             </div>
@@ -35,7 +35,6 @@ const Footer: React.FC = () => {
               <li><Link to="/" className="text-white/80 hover:text-white transition-colors">الرئيسية</Link></li>
               <li><Link to="/results" className="text-white/80 hover:text-white transition-colors">التحليلات</Link></li>
               <li><Link to="/" className="text-white/80 hover:text-white transition-colors">المميزات</Link></li>
-              <li><Link to="/" className="text-white/80 hover:text-white transition-colors">التسعير</Link></li>
             </ul>
           </div>
           
@@ -45,7 +44,6 @@ const Footer: React.FC = () => {
               <li><Link to="/" className="text-white/80 hover:text-white transition-colors">مركز المساعدة</Link></li>
               <li><Link to="/" className="text-white/80 hover:text-white transition-colors">التوثيق</Link></li>
               <li><Link to="/" className="text-white/80 hover:text-white transition-colors">API</Link></li>
-              <li><Link to="/" className="text-white/80 hover:text-white transition-colors">الشركاء</Link></li>
             </ul>
           </div>
           
