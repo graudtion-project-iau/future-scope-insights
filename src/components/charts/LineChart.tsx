@@ -11,22 +11,19 @@ interface LineChartProps {
   }>;
   xAxisDataKey: string;
   height?: number;
-  rtl?: boolean;
 }
 
 const LineChart: React.FC<LineChartProps> = ({ 
   data, 
   lines, 
   xAxisDataKey, 
-  height = 300,
-  rtl = true
+  height = 300
 }) => {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RechartsLineChart
         data={data}
         margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-        direction={rtl ? 'rtl' : 'ltr'}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis 

@@ -10,18 +10,16 @@ interface PieChartProps {
   }>;
   innerRadius?: number;
   outerRadius?: number;
-  rtl?: boolean;
 }
 
 const PieChart: React.FC<PieChartProps> = ({ 
   data, 
   innerRadius = 60,
   outerRadius = 80,
-  rtl = true
 }) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <RechartsPieChart direction={rtl ? 'rtl' : 'ltr'}>
+      <RechartsPieChart>
         <Pie
           data={data}
           cx="50%"

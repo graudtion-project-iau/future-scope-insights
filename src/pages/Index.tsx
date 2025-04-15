@@ -11,6 +11,10 @@ import { Button } from '@/components/ui/button';
 const Index = () => {
   const navigate = useNavigate();
 
+  const handleExampleClick = (query: string) => {
+    navigate(`/results?q=${encodeURIComponent(query)}`);
+  };
+
   const teamMembers = [
     {
       name: "حاتم العتيبي",
@@ -52,6 +56,26 @@ const Index = () => {
         mentions: "2.5M+",
         languages: "20+",
         sentiment: "93% إيجابي"
+      },
+      detailedReport: {
+        sentimentData: [
+          { name: 'إيجابي', value: 93, color: '#4CAF50' },
+          { name: 'محايد', value: 5, color: '#FFC107' },
+          { name: 'سلبي', value: 2, color: '#FF5722' }
+        ],
+        languageBreakdown: [
+          { name: 'العربية', value: 45, color: '#2196F3' },
+          { name: 'الإنجليزية', value: 30, color: '#9C27B0' },
+          { name: 'الإسبانية', value: 15, color: '#FF9800' },
+          { name: 'أخرى', value: 10, color: '#607D8B' }
+        ],
+        timeSeriesData: [
+          { time: '0h', mentions: 100000 },
+          { time: '6h', mentions: 500000 },
+          { time: '12h', mentions: 1500000 },
+          { time: '24h', mentions: 2500000 }
+        ],
+        topKeywords: ['تاريخي', 'إنجاز', 'فخر', 'أبطال', 'معجزة']
       }
     },
     {
@@ -61,6 +85,25 @@ const Index = () => {
         responseTime: "< 2 دقيقة",
         accuracy: "99.9%",
         alerts: "متعددة القنوات"
+      },
+      detailedReport: {
+        timeline: [
+          { time: "18:30", event: "سماع صوت الانفجار" },
+          { time: "18:32", event: "إرسال تنبيهات أولية" },
+          { time: "18:45", event: "تأكيد: مناورة تدريبية" }
+        ],
+        locationData: [
+          { name: 'الخبر', value: 60, color: '#2196F3' },
+          { name: 'بقيق', value: 25, color: '#4CAF50' },
+          { name: 'الظهران', value: 15, color: '#FF9800' }
+        ],
+        mentionsTimeline: [
+          { time: '18:30', mentions: 50 },
+          { time: '18:45', mentions: 300 },
+          { time: '19:00', mentions: 150 },
+          { time: '19:15', mentions: 75 }
+        ],
+        verificationStatus: "تم التأكد: مناورة تدريبية عسكرية"
       }
     }
   ];
@@ -69,10 +112,8 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
       <Navbar />
       
-      {/* Hero Section with Animated Background */}
       <section className="pt-24 pb-16 px-4 md:pt-32 md:pb-24 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          {/* Animated Emojis Background */}
           <div className="absolute animate-float opacity-10 top-20 right-10 text-6xl">🔍</div>
           <div className="absolute animate-float opacity-10 bottom-20 left-10 text-6xl" style={{ animationDelay: "1s" }}>📊</div>
           <div className="absolute animate-float opacity-10 top-40 left-1/4 text-6xl" style={{ animationDelay: "1.5s" }}>📱</div>
@@ -132,7 +173,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Case Studies Section */}
       <section className="py-16 bg-white px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-12 text-center heading-gradient">أحداث حقيقية تم تحليلها</h2>
@@ -144,7 +184,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Team Section */}
       <section className="py-16 bg-gray-50 px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-12 text-center heading-gradient">
@@ -158,7 +197,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Features Section */}
       <section className="py-16 bg-white px-4">
         <div className="container mx-auto">
           <div className="text-center mb-12">
@@ -204,7 +242,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* CTA Section */}
       <section className="py-16 bg-saudi-green text-white px-4">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">ابدأ رحلتك مع FutureVision اليوم</h2>
@@ -217,7 +254,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* FAQ Section */}
       <section className="py-16 bg-gray-50 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-12">
