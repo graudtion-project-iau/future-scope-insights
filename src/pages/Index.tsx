@@ -1,44 +1,111 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, BarChart3, Globe2, Users, ChevronDown } from 'lucide-react';
+import { MessageSquare, BarChart3, Globe2, Users, ChevronDown, Bell, Mail, Shield, Search } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
+import TeamMember from '@/components/TeamMember';
+import CaseStudy from '@/components/CaseStudy';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const navigate = useNavigate();
 
-  const handleExampleClick = (query: string) => {
-    navigate(`/results?q=${encodeURIComponent(query)}`);
-  };
+  const teamMembers = [
+    {
+      name: "حاتم العتيبي",
+      role: "Full Stack & AI Engineer",
+      description: "مطور متكامل مع خبرة في الذكاء الاصطناعي. ساهم في تطوير واجهة المستخدم والخلفية، مع تخصص في هندسة عكسية لـ Twitter API وتقنيات استخراج البيانات.",
+      image: "/team/hatem.jpg"
+    },
+    {
+      name: "عمر الصحفي",
+      role: "AI Engineer",
+      description: "مهندس ذكاء اصطناعي متخصص في تطوير خوارزميات التعلم الآلي ومعالجة اللغات الطبيعية لتحليل وفهم المحتوى عبر منصات التواصل الاجتماعي.",
+      image: "/team/omar.jpg"
+    },
+    {
+      name: "مشاري التميمي",
+      role: "Data Engineer",
+      description: "خبير في تحليل البيانات وتطوير خطوط معالجة البيانات. متخصص في بناء أنظمة معالجة البيانات الضخمة وتحويلها إلى رؤى قابلة للتنفيذ.",
+      image: "/team/meshari.jpg"
+    },
+    {
+      name: "عبدالرحمن",
+      role: "Data Analyst",
+      description: "متخصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
+      image: "/team/abdulrahman.jpg"
+    },
+    {
+      name: "نايف الصحفي",
+      role: "Design Engineer",
+      description: "مهندس تصميم وواجهة أمامية، متخصص في إنشاء تجارب مستخدم جذابة وسلسة مع التركيز على التصميم التفاعلي.",
+      image: "/team/naif.jpg"
+    }
+  ];
+
+  const caseStudies = [
+    {
+      title: "مباراة السعودية والأرجنتين 🇸🇦 🇦🇷",
+      description: "تحليل شامل لردود الفعل العالمية على مباراة كأس العالم التاريخية، مع تغطية لأكثر من 20 لغة وتحليل المشاعر العالمية.",
+      metrics: {
+        mentions: "2.5M+",
+        languages: "20+",
+        sentiment: "93% إيجابي"
+      }
+    },
+    {
+      title: "حادث الانفجار في الخبر 🚨",
+      description: "نظام إنذار فوري عبر البريد الإلكتروني والواتساب للأحداث الطارئة، مع تحليل مباشر للمعلومات وتأكيد مصادرها.",
+      metrics: {
+        responseTime: "< 2 دقيقة",
+        accuracy: "99.9%",
+        alerts: "متعددة القنوات"
+      }
+    }
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Hero Section with Animated Background */}
       <section className="pt-24 pb-16 px-4 md:pt-32 md:pb-24 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-30">
-          <div className="absolute right-0 top-20 w-72 h-72 rounded-full bg-saudi-green opacity-20 blur-3xl animate-pulse-soft"></div>
-          <div className="absolute left-0 bottom-20 w-72 h-72 rounded-full bg-saudi-gold opacity-20 blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute inset-0 z-0">
+          {/* Animated Emojis Background */}
+          <div className="absolute animate-float opacity-10 top-20 right-10 text-6xl">🔍</div>
+          <div className="absolute animate-float opacity-10 bottom-20 left-10 text-6xl" style={{ animationDelay: "1s" }}>📊</div>
+          <div className="absolute animate-float opacity-10 top-40 left-1/4 text-6xl" style={{ animationDelay: "1.5s" }}>📱</div>
+          <div className="absolute animate-float opacity-10 bottom-40 right-1/4 text-6xl" style={{ animationDelay: "2s" }}>💡</div>
         </div>
         
         <div className="container mx-auto relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 heading-gradient animate-slide-up font-cairo">
-              راقب الحياة الواقعية، وحول البيانات إلى رؤى 🚀
+              نظام ذكي لمراقبة وتحليل<br />
+              <span className="text-saudi-green">نبض مدينتك 🌟</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              استخدم منصة FutureVision لتحليل محتوى وسائل التواصل الاجتماعي والحصول على رؤى قيمة بأكثر من 50 لغة
+            <p className="text-lg md:text-xl text-gray-600 mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+              اكتشف الأحداث المهمة فور وقوعها. إشعارات فورية عبر البريد والواتساب لكل ما يهم عملك ومدينتك.
+              تحليل ذكي بأكثر من ٢٠ لغة لفهم ومراقبة كل ما يدور حولك.
             </p>
             
-            <div className="mb-12 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <div className="flex gap-4 justify-center mb-8 animate-slide-up" style={{ animationDelay: "0.4s" }}>
+              <Button className="btn-saudi gap-2">
+                <Bell className="w-4 h-4" />
+                أعلمني فوراً
+              </Button>
+              <Button variant="outline" className="btn-saudi-outlined gap-2">
+                <Search className="w-4 h-4" />
+                جرب الآن
+              </Button>
+            </div>
+
+            <div className="mb-12 animate-slide-up" style={{ animationDelay: "0.6s" }}>
               <SearchBar large={true} />
             </div>
             
-            <div className="text-sm text-gray-500 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+            <div className="text-sm text-gray-500 animate-slide-up" style={{ animationDelay: "0.8s" }}>
               <p className="mb-2">جرب بعض الأمثلة:</p>
               <div className="flex flex-wrap justify-center gap-2">
                 <button 
@@ -61,6 +128,32 @@ const Index = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Case Studies Section */}
+      <section className="py-16 bg-white px-4">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold mb-12 text-center heading-gradient">أحداث حقيقية تم تحليلها</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {caseStudies.map((study, index) => (
+              <CaseStudy key={index} {...study} />
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Team Section */}
+      <section className="py-16 bg-gray-50 px-4">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold mb-12 text-center heading-gradient">
+            فريق التطوير - جامعة الإمام عبدالرحمن بن فيصل
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {teamMembers.map((member, index) => (
+              <TeamMember key={index} {...member} />
+            ))}
           </div>
         </div>
       </section>
@@ -116,7 +209,7 @@ const Index = () => {
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">ابدأ رحلتك مع FutureVision اليوم</h2>
           <p className="text-white/80 max-w-2xl mx-auto mb-8">
-            انضم إلى آلاف العملاء الذين يستخدمون منصتنا للحصول على رؤى قيمة من بيانات وسائل التواصل الاجتماعي
+            انضم إلى آلاف العملاء الذين يستخدمون منصتنا للحصول على رؤى قيمة من بيانات و��ائل التواصل الاجتماعي
           </p>
           <Button className="bg-white text-saudi-green hover:bg-saudi-gold hover:text-white transition-all px-8 py-6 text-lg rounded-full shadow-lg">
             سجل الآن مجاناً
