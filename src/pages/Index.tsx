@@ -137,12 +137,13 @@ const Index = () => {
         <div className="container mx-auto relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 heading-gradient animate-slide-up font-cairo">
-              نظام ذكي لمراقبة وتحليل<br />
-              <span className="text-saudi-green">نبض مدينتك 🌟</span>
+              مراقبة ذكية لكل ما يهمك<br />
+              <span className="text-saudi-green">في الوقت الحقيقي 🌟</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-              اكتشف الأحداث المهمة فور وقوعها. إشعارات فورية عبر البريد والواتساب لكل ما يهم عملك ومدينتك.
-              تحليل ذكي بأكثر من ٢٠ لغة لفهم ومراقبة كل ما يدور حولك.
+              نظام متكامل لمراقبة وتحليل المحتوى من أكثر من 5 مصادر رئيسية.
+              تحليل فوري للأحداث الرياضية، السياحية، والفعاليات العامة.
+              تنبيهات مباشرة عبر البريد والواتساب مع تحليل ذكي بأكثر من 20 لغة.
             </p>
             
             <div className="flex gap-4 justify-center mb-8 animate-slide-up" style={{ animationDelay: "0.4s" }}>
