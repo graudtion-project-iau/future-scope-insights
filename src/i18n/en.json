@@ -1,0 +1,33 @@
+
+{
+  "nav": {
+    "home": "Home",
+    "reports": "Reports",
+    "features": "Features",
+    "pricing": "Pricing",
+    "startNow": "Start Now"
+  },
+  "hero": {
+    "title": "Smart Monitoring for Everything You Care About",
+    "subtitle": "Real-time",
+    "description": "Integrated system for monitoring and analyzing content from more than 5 main sources. Instant analysis of sports events, tourism, and public events. Direct alerts via email and WhatsApp with smart analysis in more than 20 languages."
+  },
+  "registration": {
+    "title": "Register",
+    "phoneNumber": "Phone Number",
+    "fullName": "Full Name",
+    "next": "Next",
+    "enterOtp": "Enter OTP",
+    "otpSent": "OTP has been sent to",
+    "verify": "Verify",
+    "interests": "Choose Your Interests",
+    "success": "Registration Successful!",
+    "startUsing": "Start Using Platform",
+    "phoneError": "Please enter a valid Saudi phone number",
+    "nameError": "Please enter your full name",
+    "messagePrefs": "Message Preferences",
+    "instant": "Instant",
+    "daily": "Daily Summary",
+    "weekly": "Weekly Summary"
+  }
+}
