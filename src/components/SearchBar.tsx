@@ -4,17 +4,53 @@ import { useNavigate } from 'react-router-dom';
 import { Search, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { apiUrl } from '@/api/apiUrls';
+import API_ENDPOINTS from '@/api/apiUrls';
+import { get } from '@/api/apiClient';
 
 interface SearchBarProps {
   large?: boolean;
   onSearch?: (query: string) => void;
 }
 
+interface SearchSuggestion {
+  text: string;
+  score: number;
+}
+
 const SearchBar: React.FC<SearchBarProps> = ({ large = false, onSearch }) => {
   const [query, setQuery] = useState<string>("");
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const isRTL = language === 'ar';
+
+  // Fetch suggestions as user types
+  const fetchSuggestions = async (searchQuery: string) => {
+    if (searchQuery.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const suggestionsUrl = apiUrl(`${API_ENDPOINTS.search.suggestions}?q=${encodeURIComponent(searchQuery)}`);
+      const data = await get<{ suggestions: SearchSuggestion[] }>(
+        API_ENDPOINTS.search.suggestions + `?q=${encodeURIComponent(searchQuery)}`,
+        'searchResults'
+      );
+      
+      if (data?.suggestions) {
+        setSuggestions(data.suggestions);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +61,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ large = false, onSearch }) => {
         navigate(`/results?q=${encodeURIComponent(query)}`);
       }
     }
+  };
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    
+    // Debounce API calls to avoid too many requests
+    const handler = setTimeout(() => {
+      fetchSuggestions(newQuery);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
   };
 
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
@@ -40,9 +90,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ large = false, onSearch }) => {
         </div>
         <input
           type="text"
-          placeholder="Enter your query... e.g., Tourism opinions in Saudi Arabia"
+          placeholder={t('search.placeholder')}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleQueryChange}
           className={`
             block w-full ${isRTL ? 'pr-10 pl-16' : 'pl-10 pr-16'} border-gray-300 rounded-full
             bg-white bg-opacity-90 backdrop-blur-sm shadow-lg
@@ -56,6 +106,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ large = false, onSearch }) => {
           <Button 
             type="submit" 
             className={`btn-saudi rounded-full ${large ? 'py-2 px-6' : 'py-1 px-3'} flex items-center justify-center gap-2`}
+            disabled={isLoading}
           >
             {isRTL ? 'بحث' : 'Search'}
             <ArrowIcon className="h-4 w-4" />

@@ -29,5 +29,19 @@
     "instant": "Instant",
     "daily": "Daily Summary",
     "weekly": "Weekly Summary"
+  },
+  "search": {
+    "placeholder": "Enter your query... e.g., Tourism opinions in Saudi Arabia",
+    "button": "Search",
+    "examples": "Try some examples:",
+    "noResults": "No results found",
+    "error": "Error occurred while searching",
+    "suggestions": "Suggestions"
+  },
+  "api": {
+    "error": "Error communicating with server",
+    "tryAgain": "Please try again",
+    "offline": "You appear to be offline",
+    "serverError": "Server error occurred"
   }
 }
