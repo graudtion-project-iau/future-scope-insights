@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { X } from "lucide-react";
 
 const SECTORS = [
   { value: "retail", label: "التجزئة" },
@@ -20,22 +20,13 @@ const SECTORS = [
   { value: "energy", label: "الطاقة" }
 ];
 
-const CITIES = [
-  { value: "riyadh", label: "الرياض" },
-  { value: "jeddah", label: "جدة" },
-  { value: "makkah", label: "مكة المكرمة" },
-  { value: "madinah", label: "المدينة المنورة" },
-  { value: "dammam", label: "الدمام" },
-  { value: "taif", label: "الطائف" },
-  { value: "tabuk", label: "تبوك" },
-  { value: "abha", label: "أبها" }
-];
-
 interface UserInterests {
   monitorType: string;
   businessName?: string;
   city?: string;
   sector?: string;
+  keywords: string[];
+  accountsToMonitor: string[];
   socialMediaMonitoring: {
     accountAnalysis: boolean;
     tweetSearch: boolean;
@@ -43,35 +34,64 @@ interface UserInterests {
   }
 }
 
-const InterestsSelection: React.FC = () => {
+const InterestsSelection = () => {
   const navigate = useNavigate();
   const [interests, setInterests] = useState<UserInterests>({
     monitorType: "business",
-    businessName: "",
-    city: "",
-    sector: "",
+    keywords: [],
+    accountsToMonitor: [],
     socialMediaMonitoring: {
       accountAnalysis: false,
       tweetSearch: false,
       accountSummary: false,
     }
   });
+  
+  const [newKeyword, setNewKeyword] = useState("");
+  const [newAccount, setNewAccount] = useState("");
 
-  const handleMonitorTypeChange = (value: string) => {
-    setInterests({
-      ...interests,
-      monitorType: value,
-    });
+  const handleAddKeyword = () => {
+    if (newKeyword && interests.keywords.length < 5) {
+      setInterests(prev => ({
+        ...prev,
+        keywords: [...prev.keywords, newKeyword]
+      }));
+      setNewKeyword("");
+    }
+  };
+
+  const handleRemoveKeyword = (index: number) => {
+    setInterests(prev => ({
+      ...prev,
+      keywords: prev.keywords.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddAccount = () => {
+    if (newAccount) {
+      setInterests(prev => ({
+        ...prev,
+        accountsToMonitor: [...prev.accountsToMonitor, newAccount]
+      }));
+      setNewAccount("");
+    }
+  };
+
+  const handleRemoveAccount = (index: number) => {
+    setInterests(prev => ({
+      ...prev,
+      accountsToMonitor: prev.accountsToMonitor.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSocialMediaOptionChange = (option: keyof typeof interests.socialMediaMonitoring) => {
-    setInterests({
-      ...interests,
+    setInterests(prev => ({
+      ...prev,
       socialMediaMonitoring: {
-        ...interests.socialMediaMonitoring,
-        [option]: !interests.socialMediaMonitoring[option],
+        ...prev.socialMediaMonitoring,
+        [option]: !prev.socialMediaMonitoring[option],
       },
-    });
+    }));
   };
 
   const handleSaveInterests = () => {
@@ -96,91 +116,81 @@ const InterestsSelection: React.FC = () => {
     <div className="container mx-auto py-8 px-4 md:px-0">
       <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-8 border border-gray-100">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">اختر اهتماماتك</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">اختر اهتماماتك</h1>
+          <p className="text-gray-600">
             ساعدنا في تخصيص تجربتك من خلال اختيار المجالات التي تهتم بمتابعتها
           </p>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-gray-700">ما الذي ترغب في مراقبته؟</h2>
-            <RadioGroup 
-              defaultValue={interests.monitorType}
-              onChange={(e) => handleMonitorTypeChange(e.target.value)}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <RadioGroupItem value="business" id="business" />
-                  <Label htmlFor="business">مشروعي / علامتي التجارية</Label>
+            <h2 className="text-lg font-semibold text-gray-700">الكلمات المفتاحية للمراقبة</h2>
+            <div className="flex gap-2">
+              <Input 
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                placeholder="أضف كلمة مفتاحية"
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleAddKeyword}
+                disabled={interests.keywords.length >= 5}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                إضافة
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {interests.keywords.map((keyword, index) => (
+                <div key={index} className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full">
+                  <span>{keyword}</span>
+                  <button
+                    onClick={() => handleRemoveKeyword(index)}
+                    className="hover:text-red-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <RadioGroupItem value="city" id="city" />
-                  <Label htmlFor="city">مدينتي</Label>
-                </div>
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <RadioGroupItem value="sector" id="sector" />
-                  <Label htmlFor="sector">قطاع محدد</Label>
-                </div>
-              </div>
-            </RadioGroup>
+              ))}
+            </div>
+            {interests.keywords.length >= 5 && (
+              <p className="text-amber-600 text-sm">يمكنك إضافة 5 كلمات مفتاحية كحد أقصى</p>
+            )}
           </div>
 
-          {interests.monitorType === "business" && (
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-gray-700">اسم المشروع أو العلامة التجارية</h2>
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold text-gray-700">حسابات للمراقبة والتحليل</h2>
+            <div className="flex gap-2">
               <Input 
-                placeholder="أدخل اسم مشروعك أو علامتك التجارية" 
-                value={interests.businessName || ""}
-                onChange={(e) => setInterests({...interests, businessName: e.target.value})}
+                value={newAccount}
+                onChange={(e) => setNewAccount(e.target.value)}
+                placeholder="@username"
+                className="flex-1"
               />
-            </div>
-          )}
-
-          {interests.monitorType === "city" && (
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-gray-700">اختر المدينة</h2>
-              <Select 
-                value={interests.city || ""} 
-                onValueChange={(value) => setInterests({...interests, city: value})}
+              <Button 
+                onClick={handleAddAccount}
+                className="bg-green-600 hover:bg-green-700"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر المدينة" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CITIES.map((city) => (
-                    <SelectItem key={city.value} value={city.value}>
-                      {city.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                إضافة
+              </Button>
             </div>
-          )}
-
-          {interests.monitorType === "sector" && (
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-gray-700">اختر القطاع</h2>
-              <Select 
-                value={interests.sector || ""} 
-                onValueChange={(value) => setInterests({...interests, sector: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر القطاع" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SECTORS.map((sector) => (
-                    <SelectItem key={sector.value} value={sector.value}>
-                      {sector.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {interests.accountsToMonitor.map((account, index) => (
+                <div key={index} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
+                  <span>{account}</span>
+                  <button
+                    onClick={() => handleRemoveAccount(index)}
+                    className="hover:text-red-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
 
           <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-gray-700">خيارات المراقبة على وسائل التواصل</h2>
+            <h2 className="text-lg font-semibold text-gray-700">خيارات المراقبة والتحليل</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center space-x-2 space-x-reverse">
                 <Checkbox 

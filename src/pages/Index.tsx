@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, BarChart3, Globe2, Users, Bell, Mail, Shield, Search } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -7,9 +7,19 @@ import SearchBar from '@/components/SearchBar';
 import TeamMember from '@/components/TeamMember';
 import CaseStudy from '@/components/CaseStudy';
 import { Button } from '@/components/ui/button';
+import WelcomeModal from '@/components/auth/WelcomeModal';
 
 const Index = () => {
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true);
+      localStorage.setItem("hasSeenWelcome", "true");
+    }
+  }, []);
 
   const handleExampleClick = (query: string) => {
     navigate(`/results?q=${encodeURIComponent(query)}`);
@@ -123,7 +133,11 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-r from-green-50 to-blue-50">
+      <WelcomeModal 
+        open={showWelcomeModal} 
+        onOpenChange={setShowWelcomeModal} 
+      />
       <Navbar />
       
       <section className="pt-24 pb-16 px-4 md:pt-32 md:pb-24 relative overflow-hidden">
@@ -222,7 +236,7 @@ const Index = () => {
                 <Mail className="w-6 h-6 text-saudi-green" />
               </div>
               <h3 className="text-xl font-semibold mb-2">تنبيهات فورية</h3>
-              <p className="text-gray-600">إشعارات فورية عبر البريد والواتساب للأحداث المهمة</p>
+              <p className="text-gray-600">إشعارات فورية عبر البريد الإلكتروني والواتساب للأحداث المهمة</p>
             </div>
             
             <div className="dashboard-card animate-scale-in" style={{ animationDelay: '0.2s' }}>
