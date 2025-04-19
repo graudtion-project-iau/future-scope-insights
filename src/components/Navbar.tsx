@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Search, Globe, Bell } from 'lucide-react';
+import { Menu, Globe, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
               <span className="text-saudi-green text-2xl font-bold tracking-tight">Future</span>
             </Link>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
+              <div className={`ml-10 flex items-baseline space-x-4 ${language === 'ar' ? 'space-x-reverse' : ''}`}>
                 <Link to="/" className="text-gray-700 hover:text-saudi-green px-3 py-2 rounded-md text-sm font-medium">
                   {t('nav.home')}
                 </Link>
@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
             </div>
           </div>
           <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6 space-x-3">
+            <div className={`ml-4 flex items-center md:ml-6 space-x-3 ${language === 'ar' ? 'space-x-reverse' : ''}`}>
               <Button 
                 variant="ghost" 
                 size="icon" 
