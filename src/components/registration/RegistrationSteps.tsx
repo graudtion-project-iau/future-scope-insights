@@ -22,6 +22,37 @@ interface RegistrationStepsProps {
   onSuccess?: (token: string) => void;
 }
 
+// Define types for API responses
+interface RegistrationResponse {
+  success: boolean;
+  message: string;
+  userId?: string;
+  requiresVerification?: boolean;
+}
+
+interface VerifyOtpResponse {
+  success: boolean;
+  message: string;
+  token?: string;
+  expiresAt?: string;
+}
+
+interface UserProfileResponse {
+  id?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  interests?: string[];
+  preferences?: {
+    notifications?: {
+      email: boolean;
+      sms: boolean;
+      whatsapp: boolean;
+    };
+    frequency?: string;
+  };
+}
+
 const RegistrationSteps = ({ isOpen, onClose, onSuccess }: RegistrationStepsProps) => {
   const [step, setStep] = useState<'phone' | 'otp' | 'interests' | 'success'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -59,8 +90,8 @@ const RegistrationSteps = ({ isOpen, onClose, onSuccess }: RegistrationStepsProp
 
     setIsLoading(true);
     try {
-      // Call registration API
-      const response = await post(
+      // Call registration API with proper typing
+      const response = await post<RegistrationResponse>(
         API_ENDPOINTS.auth.register,
         { 
           phoneNumber, 
@@ -104,8 +135,8 @@ const RegistrationSteps = ({ isOpen, onClose, onSuccess }: RegistrationStepsProp
 
     setIsLoading(true);
     try {
-      // Verify OTP API call
-      const response = await post(
+      // Verify OTP API call with proper typing
+      const response = await post<VerifyOtpResponse>(
         API_ENDPOINTS.auth.verify,
         { phoneNumber, otp },
         'verifyOtpResponse'
@@ -144,8 +175,8 @@ const RegistrationSteps = ({ isOpen, onClose, onSuccess }: RegistrationStepsProp
 
     setIsLoading(true);
     try {
-      // Update user interests API call
-      const response = await post(
+      // Update user interests API call with proper typing
+      const response = await post<UserProfileResponse>(
         API_ENDPOINTS.user.interests,
         { 
           interests,
