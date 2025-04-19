@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, BarChart3, Globe2, Users, Bell, Mail, Shield, Search } from 'lucide-react';
+import { MessageSquare, BarChart3, Globe2, Users, Bell, Mail, Shield, Search, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import TeamMember from '@/components/TeamMember';
 import CaseStudy from '@/components/CaseStudy';
 import { Button } from '@/components/ui/button';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -122,6 +130,13 @@ const Index = () => {
     }
   ];
 
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [fullName, setFullName] = useState('');
+
+  const handleRegistration = () => {
+    console.log('Registration submitted', { phoneNumber, fullName });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
       <Navbar />
@@ -147,16 +162,58 @@ const Index = () => {
             </p>
             
             <div className="flex gap-4 justify-center mb-8 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-              <Button className="btn-saudi gap-2">
-                <Bell className="w-4 h-4" />
-                أعلمني فوراً
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="btn-saudi gap-2">
+                    <Bell className="w-4 h-4" />
+                    سجل الآن
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-center text-saudi-green">التسجيل في المنصة</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4 px-2">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="phoneNumber" className="text-right col-span-1">
+                        رقم الجوال
+                      </label>
+                      <Input 
+                        id="phoneNumber" 
+                        placeholder="٥٠٠٠٠٠٠٠٠" 
+                        className="col-span-3 text-right"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="fullName" className="text-right col-span-1">
+                        الاسم الكامل
+                      </label>
+                      <Input 
+                        id="fullName" 
+                        placeholder="اسمك الكامل" 
+                        className="col-span-3 text-right"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                      />
+                    </div>
+                    <Button 
+                      className="btn-saudi w-full mt-4" 
+                      onClick={handleRegistration}
+                    >
+                      تسجيل
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
               <Button variant="outline" className="btn-saudi-outlined gap-2">
                 <Search className="w-4 h-4" />
                 جرب الآن
               </Button>
             </div>
-
+            
             <div className="mb-12 animate-slide-up" style={{ animationDelay: "0.6s" }}>
               <SearchBar large={true} />
             </div>
@@ -204,7 +261,7 @@ const Index = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 heading-gradient">المميزات الرئيسية</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              نقدم مجموعة شاملة من الأدوات التحليلية المبتكرة لمراقبة وتحليل المحتوى بذكاء وفعالية
+              نقدم مجموعة شاملة من ��لأدوات التحليلية المبتكرة لمراقبة وتحليل المحتوى بذكاء وفعالية
             </p>
           </div>
           
