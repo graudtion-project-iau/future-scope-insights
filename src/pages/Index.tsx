@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, BarChart3, Globe2, Users, Bell, Mail, Shield, Search, Phone } from 'lucide-react';
+import { MessageSquare, Globe2, Users, Bell, Mail, Shield, Search } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import TeamMember from '@/components/TeamMember';
 import CaseStudy from '@/components/CaseStudy';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import RegistrationSteps from '@/components/registration/RegistrationSteps';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showRegistration, setShowRegistration] = useState(false);
 
   const handleExampleClick = (query: string) => {
     navigate(`/results?q=${encodeURIComponent(query)}`);
@@ -130,13 +124,6 @@ const Index = () => {
     }
   ];
 
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [fullName, setFullName] = useState('');
-
-  const handleRegistration = () => {
-    console.log('Registration submitted', { phoneNumber, fullName });
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
       <Navbar />
@@ -162,51 +149,13 @@ const Index = () => {
             </p>
             
             <div className="flex gap-4 justify-center mb-8 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="btn-saudi gap-2">
-                    <Bell className="w-4 h-4" />
-                    سجل الآن
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-center text-saudi-green">التسجيل في المنصة</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4 px-2">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <label htmlFor="phoneNumber" className="text-right col-span-1">
-                        رقم الجوال
-                      </label>
-                      <Input 
-                        id="phoneNumber" 
-                        placeholder="٥٠٠٠٠٠٠٠٠" 
-                        className="col-span-3 text-right"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <label htmlFor="fullName" className="text-right col-span-1">
-                        الاسم الكامل
-                      </label>
-                      <Input 
-                        id="fullName" 
-                        placeholder="اسمك الكامل" 
-                        className="col-span-3 text-right"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                      />
-                    </div>
-                    <Button 
-                      className="btn-saudi w-full mt-4" 
-                      onClick={handleRegistration}
-                    >
-                      تسجيل
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button 
+                className="btn-saudi gap-2"
+                onClick={() => setShowRegistration(true)}
+              >
+                <Bell className="w-4 h-4" />
+                سجل الآن
+              </Button>
               
               <Button variant="outline" className="btn-saudi-outlined gap-2">
                 <Search className="w-4 h-4" />
@@ -279,7 +228,7 @@ const Index = () => {
                 <Mail className="w-6 h-6 text-saudi-green" />
               </div>
               <h3 className="text-xl font-semibold mb-2">تنبيهات فورية</h3>
-              <p className="text-gray-600">إشعارات فورية عبر البريد والواتساب للأحداث المهمة</p>
+              <p className="text-gray-600">إشعارات فوري�� عبر البريد الإلكتروني والواتساب للأحداث المهمة</p>
             </div>
             
             <div className="dashboard-card animate-scale-in" style={{ animationDelay: '0.2s' }}>
@@ -358,6 +307,11 @@ const Index = () => {
       </section>
       
       <Footer />
+      
+      <RegistrationSteps 
+        isOpen={showRegistration} 
+        onClose={() => setShowRegistration(false)} 
+      />
     </div>
   );
 };
