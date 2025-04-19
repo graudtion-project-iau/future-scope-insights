@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -35,12 +36,13 @@ const locationData = [
   { name: "أخرى", value: 10, color: "#607D8B" },
 ];
 
+// Fixed the keywordData to ensure trend values match the KeywordItem interface
 const keywordData = [
-  { keyword: "ضيافة", count: 240, trend: "increase" },
-  { keyword: "تراث", count: 185, trend: "increase" },
-  { keyword: "تحديث", count: 142, trend: "neutral" },
-  { keyword: "فعاليات", count: 118, trend: "increase" },
-  { keyword: "ترفيه", count: 96, trend: "decrease" },
+  { keyword: "ضيافة", count: 240, trend: "increase" as const },
+  { keyword: "تراث", count: 185, trend: "increase" as const },
+  { keyword: "تحديث", count: 142, trend: "neutral" as const },
+  { keyword: "فعاليات", count: 118, trend: "increase" as const },
+  { keyword: "ترفيه", count: 96, trend: "decrease" as const },
 ];
 
 const influencerData = [
