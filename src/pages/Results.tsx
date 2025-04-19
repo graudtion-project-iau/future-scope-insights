@@ -1,15 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Activity, Users, MapPin, BarChart2, Filter, Download, Share2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
-import DataCard from '@/components/DataCard';
 import LineChart from '@/components/charts/LineChart';
 import PieChart from '@/components/charts/PieChart';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import KPICards from '@/components/results/KPICards';
+import ActionButtons from '@/components/results/ActionButtons';
+import KeywordsTable from '@/components/results/KeywordsTable';
+import InfluencersList from '@/components/results/InfluencersList';
 
 // Sample data
 const sentimentData = [
@@ -63,8 +63,6 @@ const Results = () => {
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    // Here you would typically make an API call with the new query
-    // and update the page data based on the response
     console.log("Searching for:", newQuery);
   };
 
@@ -72,7 +70,6 @@ const Results = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       
-      {/* Search Section */}
       <section className="pt-24 pb-6 px-4 bg-white border-b">
         <div className="container mx-auto">
           <div className="mb-6">
@@ -83,62 +80,13 @@ const Results = () => {
         </div>
       </section>
       
-      {/* Results Content */}
       <section className="py-8 px-4">
         <div className="container mx-auto">
           {query ? (
             <>
-              {/* KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <DataCard 
-                  title="متوسط المشاعر" 
-                  value="+0.67" 
-                  icon={<Activity className="h-5 w-5" />} 
-                  change={{ value: 12, type: 'increase' }}
-                />
-                <DataCard 
-                  title="عدد الإشارات" 
-                  value="1,200" 
-                  icon={<BarChart2 className="h-5 w-5" />} 
-                  change={{ value: 5, type: 'increase' }}
-                />
-                <DataCard 
-                  title="الموقع الرئيسي" 
-                  value="الرياض" 
-                  icon={<MapPin className="h-5 w-5" />} 
-                />
-                <DataCard 
-                  title="عدد المؤثرين" 
-                  value="24" 
-                  icon={<Users className="h-5 w-5" />} 
-                  change={{ value: 3, type: 'decrease' }}
-                />
-              </div>
+              <KPICards />
+              <ActionButtons />
               
-              {/* Filters & Actions */}
-              <div className="flex flex-wrap justify-between items-center mb-6">
-                <div className="flex space-x-2 rtl:space-x-reverse mb-4 sm:mb-0">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    تصفية النتائج
-                  </Button>
-                  <Button variant="outline" className="hidden sm:flex items-center gap-2">
-                    آخر 24 ساعة
-                  </Button>
-                </div>
-                <div className="flex space-x-2 rtl:space-x-reverse">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    تحميل التقرير
-                  </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Share2 className="h-4 w-4" />
-                    مشاركة
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Tabs */}
               <Tabs defaultValue="overview" className="mb-8">
                 <TabsList className="mb-6">
                   <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
@@ -148,7 +96,6 @@ const Results = () => {
                 </TabsList>
                 
                 <TabsContent value="overview" className="space-y-6">
-                  {/* Sentiment Over Time Chart */}
                   <div className="dashboard-card">
                     <h3 className="text-lg font-semibold mb-4">تتبع المشاعر عبر الوقت</h3>
                     <LineChart 
@@ -162,83 +109,27 @@ const Results = () => {
                     />
                   </div>
                   
-                  {/* Charts Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Sentiment Distribution */}
                     <div className="dashboard-card">
                       <h3 className="text-lg font-semibold mb-4">توزيع المشاعر</h3>
                       <PieChart data={sentimentDistribution} innerRadius={60} outerRadius={90} />
                     </div>
                     
-                    {/* Location Distribution */}
                     <div className="dashboard-card">
                       <h3 className="text-lg font-semibold mb-4">التوزيع الجغرافي</h3>
                       <PieChart data={locationData} innerRadius={60} outerRadius={90} />
                     </div>
                   </div>
                   
-                  {/* Key Insights Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Top Keywords */}
                     <div className="dashboard-card">
                       <h3 className="text-lg font-semibold mb-4">الكلمات الرئيسية</h3>
-                      <div className="overflow-hidden">
-                        <table className="min-w-full">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">الكلمة</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">التكرار</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">الاتجاه</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {keywordData.map((keyword, index) => (
-                              <tr key={index} className="border-b last:border-0 hover:bg-gray-50">
-                                <td className="px-4 py-3 text-right whitespace-nowrap text-sm font-medium text-gray-900">{keyword.keyword}</td>
-                                <td className="px-4 py-3 text-center whitespace-nowrap text-sm text-gray-500">{keyword.count}</td>
-                                <td className="px-4 py-3 text-left whitespace-nowrap text-sm">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    keyword.trend === 'increase' 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : keyword.trend === 'decrease' 
-                                      ? 'bg-red-100 text-red-800' 
-                                      : 'bg-gray-100 text-gray-800'
-                                  }`}>
-                                    {keyword.trend === 'increase' 
-                                      ? '↑ متزايد' 
-                                      : keyword.trend === 'decrease' 
-                                        ? '↓ متناقص' 
-                                        : '− ثابت'}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                      <KeywordsTable data={keywordData} />
                     </div>
                     
-                    {/* Top Influencers */}
                     <div className="dashboard-card">
                       <h3 className="text-lg font-semibold mb-4">أبرز المؤثرين</h3>
-                      <div className="space-y-4">
-                        {influencerData.map((influencer, index) => (
-                          <div key={index} className="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                            <img 
-                              src={influencer.image} 
-                              alt={influencer.name} 
-                              className="w-12 h-12 rounded-full object-cover border-2 border-saudi-green"
-                            />
-                            <div className="ml-4 mr-auto">
-                              <div className="font-medium">{influencer.name}</div>
-                              <div className="text-sm text-gray-500">{influencer.followers} متابع</div>
-                            </div>
-                            <div className="text-sm font-medium text-saudi-green bg-saudi-green/10 px-3 py-1 rounded-full">
-                              {influencer.engagement} تفاعل
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <InfluencersList data={influencerData} />
                     </div>
                   </div>
                 </TabsContent>
@@ -267,13 +158,12 @@ const Results = () => {
               <h2 className="text-xl font-semibold text-gray-700 mb-2">ابدأ البحث للحصول على تحليلات</h2>
               <p className="text-gray-500 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
               <div className="flex justify-center space-x-2 rtl:space-x-reverse">
-                <Button 
-                  variant="outline"
+                <button 
                   className="text-saudi-green border-saudi-green hover:bg-saudi-green hover:text-white"
                   onClick={() => handleSearch("آراء السياحة في السعودية")}
                 >
                   جرب: آراء السياحة في السعودية
-                </Button>
+                </button>
               </div>
             </div>
           )}
