@@ -12,11 +12,11 @@ interface TeamMemberProps {
 const TeamMember: React.FC<TeamMemberProps> = ({ name, role, description, image }) => {
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="aspect-w-16 aspect-h-9 bg-gray-100">
+      <div className="aspect-w-16 aspect-h-9 relative h-56 overflow-hidden">
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-center absolute inset-0"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = 'https://via.placeholder.com/400x300?text=صورة+الملف+الشخصي';

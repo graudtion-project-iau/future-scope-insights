@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Globe2, Users, Bell, Mail, Shield, Search } from 'lucide-react';
@@ -96,31 +97,31 @@ const Index = () => {
       name: "حاتم العتيبي",
       role: "Full Stack & AI Engineer",
       description: "مطور متكامل مع خبرة في الذكاء الاصطناعي. ساهم في تطوير واجهة المستخدم والخلفية، مع تخصص في هندسة عكسية لـ Twitter API وتقنيات استخراج البيانات.",
-      image: "https://i.ibb.co/Q3GxS5v/hatim.jpg"
+      image: "https://i.ibb.co/NdzGD42J/hatim.jpg"
     },
     {
       name: "عمر الصحفي",
       role: "AI Engineer",
       description: "مهندس ذكاء اصطناعي متخصص في تطوير خوارزميات التعلم الآلي ومعالجة اللغات الطبيعية لتحليل وفهم المحتوى عبر منصات التواصل الاجتماعي.",
-      image: "https://i.ibb.co/v6Vy8ZQ/omar.jpg"
+      image: "https://i.ibb.co/Xrj0TS30/omar.jpg"
     },
     {
       name: "مشاري التميمي",
       role: "Data Engineer",
       description: "خبير في تحليل البيانات وتطوير خطوط معالجة البيانات. متخصص في بناء أنظمة معالجة البيانات الضخمة وتحويلها إلى رؤى قابلة للتنفيذ.",
-      image: "https://i.ibb.co/6RvHfzS/image.png"
+      image: "https://via.placeholder.com/400x300?text=مشاري"
     },
     {
       name: "عبدالرحمن",
       role: "Data Analyst",
-      description: "م��خصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
-      image: "https://i.ibb.co/qMtZSVS/abdulharman.jpg"
+      description: "متخصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
+      image: "https://i.ibb.co/rGCWjNjj/abdulharman.jpg"
     },
     {
       name: "نايف الصحفي",
       role: "Design Engineer",
       description: "مهندس تصميم وواجهة أمامية، متخصص في إنشاء تجارب مستخدم جذابة وسلسة مع التركيز على التصميم التفاعلي.",
-      image: "https://i.ibb.co/Hfryj5p/Naif.jpg"
+      image: "https://i.ibb.co/G4VDqz3L/Naif.jpg"
     }
   ];
 
