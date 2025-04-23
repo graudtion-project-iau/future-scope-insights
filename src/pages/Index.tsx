@@ -96,31 +96,31 @@ const Index = () => {
       name: "حاتم العتيبي",
       role: "Full Stack & AI Engineer",
       description: "مطور متكامل مع خبرة في الذكاء الاصطناعي. ساهم في تطوير واجهة المستخدم والخلفية، مع تخصص في هندسة عكسية لـ Twitter API وتقنيات استخراج البيانات.",
-      image: "https://randomuser.me/api/portraits/men/1.jpg"
+      image: "https://i.ibb.co/Q3GxS5v/hatim.jpg"
     },
     {
       name: "عمر الصحفي",
       role: "AI Engineer",
       description: "مهندس ذكاء اصطناعي متخصص في تطوير خوارزميات التعلم الآلي ومعالجة اللغات الطبيعية لتحليل وفهم المحتوى عبر منصات التواصل الاجتماعي.",
-      image: "https://randomuser.me/api/portraits/men/2.jpg"
+      image: "https://i.ibb.co/v6Vy8ZQ/omar.jpg"
     },
     {
       name: "مشاري التميمي",
       role: "Data Engineer",
       description: "خبير في تحليل البيانات وتطوير خطوط معالجة البيانات. متخصص في بناء أنظمة معالجة البيانات الضخمة وتحويلها إلى رؤى قابلة للتنفيذ.",
-      image: "https://randomuser.me/api/portraits/men/3.jpg"
+      image: "https://i.ibb.co/6RvHfzS/image.png"
     },
     {
       name: "عبدالرحمن",
       role: "Data Analyst",
-      description: "متخصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
-      image: "https://randomuser.me/api/portraits/men/4.jpg"
+      description: "م��خصص في استخراج وتحليل البيانات، مع خبرة في تطوير حلول Web Scraping وتحليل البيانات المجمعة لاستخراج الرؤى القيمة.",
+      image: "https://i.ibb.co/qMtZSVS/abdulharman.jpg"
     },
     {
       name: "نايف الصحفي",
       role: "Design Engineer",
       description: "مهندس تصميم وواجهة أمامية، متخصص في إنشاء تجارب مستخدم جذابة وسلسة مع التركيز على التصميم التفاعلي.",
-      image: "https://randomuser.me/api/portraits/men/5.jpg"
+      image: "https://i.ibb.co/Hfryj5p/Naif.jpg"
     }
   ];
 
@@ -264,7 +264,7 @@ const Index = () => {
               {[
                 {
                   q: "كيف يمكنني البدء باستخدام المنصة؟",
-                  a: "ببساطة قم بإنشاء حساب جديد مجاني، وابدأ في استكشاف البيانات والتحليلات المتاحة."
+                  a: "ببساطة قم بإنشاء حساب جديد مجاني، وابدأ في استكشاف ��لبيانات والتحليلات المتاحة."
                 },
                 {
                   q: "ما هي مصادر البيانات التي تعتمد عليها المنصة؟",
