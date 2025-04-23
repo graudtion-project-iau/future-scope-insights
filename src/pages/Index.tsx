@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Globe2, Users, Bell, Mail, Shield, Search } from 'lucide-react';
@@ -109,7 +108,7 @@ const Index = () => {
       name: "مشاري التميمي",
       role: "Data Engineer",
       description: "خبير في تحليل البيانات وتطوير خطوط معالجة البيانات. متخصص في بناء أنظمة معالجة البيانات الضخمة وتحويلها إلى رؤى قابلة للتنفيذ.",
-      image: "https://via.placeholder.com/400x300?text=مشاري"
+      image: "https://i.ibb.co/7Jgn6PD1/image.png"
     },
     {
       name: "عبدالرحمن",
@@ -265,7 +264,7 @@ const Index = () => {
               {[
                 {
                   q: "كيف يمكنني البدء باستخدام المنصة؟",
-                  a: "ببساطة قم بإنشاء حساب جديد مجاني، وابدأ في استكشاف ��لبيانات والتحليلات المتاحة."
+                  a: "ببساطة قم بإنشاء حساب جديد مجاني، وابدأ في استكشاف ����لبيانات والتحليلات المتاحة."
                 },
                 {
                   q: "ما هي مصادر البيانات التي تعتمد عليها المنصة؟",
