@@ -6,14 +6,27 @@ const API_ENDPOINTS = {
   // Auth related endpoints
   auth: {
     login: '/auth/login',
-    register: '/auth/register',
     verify: '/auth/verify',
+    register: '/auth/register',
   },
   
   // Search related endpoints
   search: {
     query: '/search',
     suggestions: '/search/suggestions',
+    trending: '/search/trending',
+    filter: '/search/filter',
+  },
+  
+  // Analysis related endpoints
+  analysis: {
+    overview: '/analysis/overview',
+    sentiment: '/analysis/sentiment',
+    trends: '/analysis/trends',
+    tweets: '/analysis/tweets',
+    influencers: '/analysis/influencers',
+    timeline: '/analysis/timeline',
+    location: '/analysis/location',
   },
   
   // User related endpoints
@@ -21,6 +34,7 @@ const API_ENDPOINTS = {
     profile: '/user/profile',
     interests: '/user/interests',
     preferences: '/user/preferences',
+    saved: '/user/saved',
   },
   
   // Reports related endpoints
@@ -36,12 +50,22 @@ const API_ENDPOINTS = {
     topics: '/monitoring/topics',
     alerts: '/monitoring/alerts',
     configure: '/monitoring/configure',
+    events: '/monitoring/events',
+  },
+
+  // Tweet related endpoints
+  tweets: {
+    list: '/tweets',
+    details: (id: string) => `/tweets/${id}`,
+    popular: '/tweets/popular',
+    earliest: '/tweets/earliest',
+    latest: '/tweets/latest',
   }
 };
 
 // Function to generate full API URLs
 export const apiUrl = (endpoint: string): string => {
-  return `${API_URL_BASE}${endpoint}`;
+  return `https://Futvi.com/api${endpoint}`;
 };
 
 export default API_ENDPOINTS;

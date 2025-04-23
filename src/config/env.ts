@@ -1,8 +1,8 @@
 
 // Environment variables configuration
 
-// Default to development API URL if not provided
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+// Set the API URL from environment or use the provided Futvi API URL
+const API_URL = import.meta.env.VITE_API_URL || 'https://Futvi.com/api';
 const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://future-scope-insights.com';
 
 // Configuration object with all environment variables
