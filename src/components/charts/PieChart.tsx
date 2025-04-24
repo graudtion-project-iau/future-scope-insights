@@ -2,15 +2,20 @@
 import React from 'react';
 import { ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
+interface DataItem {
+  name: string;
+  value: number;
+  color?: string;
+}
+
 interface PieChartProps {
-  data: Array<{
-    name: string;
-    value: number;
-    color: string;
-  }>;
+  data: Array<DataItem>;
   innerRadius?: number;
   outerRadius?: number;
 }
+
+// Define default colors to use when color is not provided
+const defaultColors = ['#4CAF50', '#FFC107', '#F44336', '#2196F3', '#9C27B0', '#3F51B5', '#607D8B', '#795548', '#FF9800', '#00BCD4'];
 
 const PieChart: React.FC<PieChartProps> = ({ 
   data, 
@@ -35,7 +40,7 @@ const PieChart: React.FC<PieChartProps> = ({
           animationEasing="ease-out"
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} />
+            <Cell key={`cell-${index}`} fill={entry.color || defaultColors[index % defaultColors.length]} />
           ))}
         </Pie>
         <Tooltip

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Users, MapPin, BarChart2, Clock, Fire, Sparkles } from 'lucide-react';
+import { Activity, Users, MapPin, BarChart2, Clock, Flame, Sparkles } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
@@ -30,17 +30,19 @@ const sentimentData = [
   { date: "7 يناير", إيجابي: 3490, محايد: 4300, سلبي: 700 },
 ];
 
+// Updated sentiment distribution without the color property
 const sentimentDistribution = [
-  { name: "إيجابي", value: 67, color: "#4CAF50" },
-  { name: "محايد", value: 23, color: "#FFC107" },
-  { name: "سلبي", value: 10, color: "#F44336" },
+  { name: "إيجابي", value: 67 },
+  { name: "محايد", value: 23 },
+  { name: "سلبي", value: 10 },
 ];
 
+// Updated location data without the color property
 const locationData = [
-  { name: "الرياض", value: 45, color: "#2196F3" },
-  { name: "العلا", value: 25, color: "#9C27B0" },
-  { name: "جدة", value: 20, color: "#3F51B5" },
-  { name: "أخرى", value: 10, color: "#607D8B" },
+  { name: "الرياض", value: 45 },
+  { name: "العلا", value: 25 },
+  { name: "جدة", value: 20 },
+  { name: "أخرى", value: 10 },
 ];
 
 const keywordData = [
@@ -537,7 +539,7 @@ const Results = () => {
                             <HighlightedTweet 
                               tweet={overview.highlightTweets.mostLiked}
                               title="الأكثر إعجاباً"
-                              icon={<Fire className="h-4 w-4 text-saudi-green" />}
+                              icon={<Flame className="h-4 w-4 text-saudi-green" />}
                             />
                           )}
                         </div>
@@ -548,9 +550,9 @@ const Results = () => {
                           <h3 className="text-lg font-semibold mb-4">توزيع المشاعر</h3>
                           <PieChart 
                             data={[
-                              { name: "إيجابي", value: overview.sentiment.positive, color: "#4CAF50" },
-                              { name: "محايد", value: overview.sentiment.neutral, color: "#FFC107" },
-                              { name: "سلبي", value: overview.sentiment.negative, color: "#F44336" },
+                              { name: "إيجابي", value: overview.sentiment.positive },
+                              { name: "محايد", value: overview.sentiment.neutral },
+                              { name: "سلبي", value: overview.sentiment.negative },
                             ]} 
                             innerRadius={60} 
                             outerRadius={90} 
@@ -560,7 +562,7 @@ const Results = () => {
                         <div className="dashboard-card">
                           <h3 className="text-lg font-semibold mb-4">التوزيع الجغرافي</h3>
                           <PieChart 
-                            data={overview.locations.map(loc => ({ ...loc, color: loc.color || '#607D8B' }))} 
+                            data={overview.locations} 
                             innerRadius={60} 
                             outerRadius={90} 
                           />
@@ -602,9 +604,9 @@ const Results = () => {
                             <h3 className="text-lg font-semibold mb-4">توزيع المشاعر</h3>
                             <PieChart 
                               data={[
-                                { name: "إيجابي", value: overview.sentiment.positive, color: "#4CAF50" },
-                                { name: "محايد", value: overview.sentiment.neutral, color: "#FFC107" },
-                                { name: "سلبي", value: overview.sentiment.negative, color: "#F44336" },
+                                { name: "إيجابي", value: overview.sentiment.positive },
+                                { name: "محايد", value: overview.sentiment.neutral },
+                                { name: "سلبي", value: overview.sentiment.negative },
                               ]} 
                               innerRadius={60} 
                               outerRadius={90} 
