@@ -1,4 +1,3 @@
-
 # Future Vision API Documentation
 
 ## Base URL
