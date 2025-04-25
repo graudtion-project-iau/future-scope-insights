@@ -462,6 +462,12 @@ const Results = () => {
     fetchTweets(query, page);
   };
 
+  const randomReports = [
+    { title: "الإحصائيات اليومية", description: "تفاصيل الإحصائيات اليومية للمنتخب السعودي", metrics: { "إجمالي الإعجابات": "12345", "إجمالي التغريدات": "6789" } },
+    { title: "تحليل المشاعر", description: "تحليل المشاعر للمنتخب السعودي", metrics: { "إيجابي": "45%", "محايد": "30%", "سلبي": "25%" } },
+    { title: "التوقعات المستقبلية", description: "التوقعات المستقبلية للمنتخب السعودي", metrics: { "الهدف الأول": "123", "الهدف الثاني": "456" } }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
@@ -469,7 +475,7 @@ const Results = () => {
       <section className="pt-24 pb-6 px-4 bg-white border-b">
         <div className="container mx-auto">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">نتائج البحث</h1>
+            <h1 className="text-2xl font-bold mb-2">التقارير</h1>
             <p className="text-gray-600">{query ? `استعلام: "${query}"` : 'استخدم شريط البحث للحصول على تحليلات'}</p>
           </div>
           <SearchBar onSearch={handleSearch} />
@@ -486,7 +492,6 @@ const Results = () => {
                 </div>
               ) : overview ? (
                 <>
-                  <KPICards kpis={overview.kpis} />
                   <ActionButtons />
                   
                   <Tabs defaultValue="overview" className="mb-8">
@@ -782,7 +787,35 @@ const Results = () => {
             <div className="text-center py-12">
               <h2 className="text-xl font-semibold text-gray-700 mb-2">ابدأ البحث للحصول على تحليلات</h2>
               <p className="text-gray-500 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
-              <div className="flex justify-center space-x-2 rtl:space-x-reverse">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {randomReports.map((report, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold mb-3 line-clamp-2">{report.title}</h3>
+                      <p className="text-gray-600 mb-4 line-clamp-3">{report.description}</p>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        {Object.entries(report.metrics).slice(0, 4).map(([key, value], idx) => (
+                          <div key={idx} className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-lg font-semibold text-saudi-green">{value}</div>
+                            <div className="text-sm text-gray-500">{key}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <Button 
+                        onClick={() => navigate(`/results?q=${encodeURIComponent(report.title)}`)}
+                        className="w-full bg-saudi-green hover:bg-saudi-green/90"
+                      >
+                        عرض التقرير الكامل
+                        <ArrowRight className="mr-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex justify-center space-x-2 rtl:space-x-reverse mt-8">
                 <button 
                   className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
                   onClick={() => handleSearch("السعودية الأرجنتين")}
