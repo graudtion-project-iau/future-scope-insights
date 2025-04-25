@@ -13,6 +13,7 @@ interface TweetFeedProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onFilterChange: (filters: any) => void;
+  preview?: boolean;
 }
 
 const TweetFeed: React.FC<TweetFeedProps> = ({ 
@@ -21,7 +22,8 @@ const TweetFeed: React.FC<TweetFeedProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  onFilterChange
+  onFilterChange,
+  preview = false
 }) => {
   const [selectedTweet, setSelectedTweet] = useState<Tweet | null>(null);
   
@@ -31,7 +33,7 @@ const TweetFeed: React.FC<TweetFeedProps> = ({
         <h3 className="text-lg font-semibold">التغريدات ({totalTweets.toLocaleString()})</h3>
       </div>
       
-      <TweetFilters onFilterChange={onFilterChange} />
+      {!preview && <TweetFilters onFilterChange={onFilterChange} />}
       
       <div className="space-y-4">
         {tweets.map(tweet => (
@@ -43,63 +45,65 @@ const TweetFeed: React.FC<TweetFeedProps> = ({
         ))}
       </div>
       
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious 
-              href="#" 
-              onClick={(e) => {
-                e.preventDefault();
-                if (currentPage > 1) onPageChange(currentPage - 1);
-              }}
-              className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
-            />
-          </PaginationItem>
-          
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            let pageNum: number;
+      {!preview && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                href="#" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage > 1) onPageChange(currentPage - 1);
+                }}
+                className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
             
-            // Handle cases with many pages
-            if (totalPages <= 5) {
-              pageNum = i + 1;
-            } else {
-              if (currentPage <= 3) {
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum: number;
+              
+              // Handle cases with many pages
+              if (totalPages <= 5) {
                 pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
               } else {
-                pageNum = currentPage - 2 + i;
+                if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
               }
-            }
+              
+              return (
+                <PaginationItem key={pageNum}>
+                  <PaginationLink 
+                    href="#" 
+                    isActive={currentPage === pageNum}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onPageChange(pageNum);
+                    }}
+                  >
+                    {pageNum}
+                  </PaginationLink>
+                </PaginationItem>
+              );
+            })}
             
-            return (
-              <PaginationItem key={pageNum}>
-                <PaginationLink 
-                  href="#" 
-                  isActive={currentPage === pageNum}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPageChange(pageNum);
-                  }}
-                >
-                  {pageNum}
-                </PaginationLink>
-              </PaginationItem>
-            );
-          })}
-          
-          <PaginationItem>
-            <PaginationNext 
-              href="#" 
-              onClick={(e) => {
-                e.preventDefault();
-                if (currentPage < totalPages) onPageChange(currentPage + 1);
-              }}
-              className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+            <PaginationItem>
+              <PaginationNext 
+                href="#" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages) onPageChange(currentPage + 1);
+                }}
+                className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
       
       <TweetDialog 
         tweet={selectedTweet} 

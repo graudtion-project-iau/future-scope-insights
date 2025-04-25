@@ -26,10 +26,13 @@ interface CaseStudyProps {
     influencers?: Array<{ 
       name: string; 
       followers: string; 
-      engagement: string; 
-      image: string; 
+      engagement?: string;
+      engagementRate?: number;
+      image?: string;
+      avatar?: string;
     }>;
     tweets?: Array<any>;
+    verificationStatus?: string;
   };
 }
 
@@ -40,6 +43,17 @@ const CaseStudy: React.FC<CaseStudyProps> = ({ title, description, metrics, deta
     navigate(`/case-study/${encodeURIComponent(title)}`, {
       state: { caseStudy: { title, description, metrics, detailedReport } }
     });
+  };
+
+  // Map influencer data to standardized format
+  const normalizeInfluencers = (influencers: any[]) => {
+    return influencers.map(influencer => ({
+      name: influencer.name,
+      followers: influencer.followers,
+      engagement: influencer.engagement || 
+                 (influencer.engagementRate ? `${influencer.engagementRate}%` : '0%'),
+      image: influencer.image || influencer.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'
+    }));
   };
 
   return (
@@ -111,7 +125,7 @@ const CaseStudy: React.FC<CaseStudyProps> = ({ title, description, metrics, deta
             {detailedReport.influencers && (
               <div className="dashboard-card">
                 <h3 className="text-lg font-semibold mb-4">أبرز المؤثرين</h3>
-                <InfluencersList data={detailedReport.influencers} />
+                <InfluencersList data={normalizeInfluencers(detailedReport.influencers)} />
               </div>
             )}
 
@@ -125,7 +139,7 @@ const CaseStudy: React.FC<CaseStudyProps> = ({ title, description, metrics, deta
                   totalPages={1}
                   onPageChange={() => {}}
                   onFilterChange={() => {}}
-                  preview
+                  preview={true}
                 />
               </div>
             )}
