@@ -79,7 +79,7 @@ const sampleTweets: Tweet[] = [
     text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
-      name: "أحمد الشمر��",
+      name: "أحمد الشمري",
       username: "@ahmed_shamri",
       profileImage: "https://randomuser.me/api/portraits/men/2.jpg",
       verified: false,
@@ -478,40 +478,7 @@ const Results = () => {
       
       <section className="py-8 px-4">
         <div className="container mx-auto">
-          {!query ? (
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">ابدأ البحث للحصول على تحليلات</h2>
-              <p className="text-gray-500 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
-              <div className="flex justify-center gap-4 flex-wrap">
-                {[
-                  {
-                    title: "السعودية الأرجنتين",
-                    desc: "تحليل تفاعلات كأس العالم",
-                    color: "bg-green-50 hover:bg-green-100 text-green-700"
-                  },
-                  {
-                    title: "انفجار الخبر",
-                    desc: "تحليل حدث أمني",
-                    color: "bg-blue-50 hover:bg-blue-100 text-blue-700"
-                  },
-                  {
-                    title: "موسم الرياض",
-                    desc: "تحليل فعالية ترفيهية",
-                    color: "bg-purple-50 hover:bg-purple-100 text-purple-700"
-                  }
-                ].map((sample, index) => (
-                  <button 
-                    key={index}
-                    onClick={() => handleSearch(sample.title)}
-                    className={`p-4 rounded-xl ${sample.color} transition-all duration-300 shadow-sm hover:shadow-md`}
-                  >
-                    <h3 className="font-semibold mb-1">{sample.title}</h3>
-                    <p className="text-sm opacity-75">{sample.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
+          {query ? (
             <>
               {loading && !overview ? (
                 <div className="flex justify-center items-center py-12">
@@ -811,6 +778,31 @@ const Results = () => {
                 </div>
               )}
             </>
+          ) : (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">ابدأ البحث للحصول على تحليلات</h2>
+              <p className="text-gray-500 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
+              <div className="flex justify-center space-x-2 rtl:space-x-reverse">
+                <button 
+                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
+                  onClick={() => handleSearch("السعودية الأرجنتين")}
+                >
+                  جرب: السعودية الأرجنتين
+                </button>
+                <button 
+                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
+                  onClick={() => handleSearch("انفجار الخبر")}
+                >
+                  جرب: انفجار الخبر
+                </button>
+                <button 
+                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
+                  onClick={() => handleSearch("موسم الرياض")}
+                >
+                  جرب: موسم الرياض
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </section>

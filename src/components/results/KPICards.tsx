@@ -15,10 +15,10 @@ interface KPICardsProps {
 
 const KPICards: React.FC<KPICardsProps> = ({ 
   kpis = [
-    { name: "متوسط المشاعر", value: "+0.67", change: 12 },
-    { name: "عدد الإشارات", value: "1,200", change: 5 },
-    { name: "الموقع الرئيسي", value: "الرياض" },
-    { name: "عدد المؤثرين", value: "24", change: -3 }
+    { name: "متوسط المشاعر", value: "+0.10", change: 5 },
+    { name: "عدد الإشارات", value: "3,250", change: 58 },
+    { name: "الموقع الرئيسي", value: "الخبر" },
+    { name: "عدد المؤثرين", value: "12" }
   ]
 }) => {
   // Map KPI names to icons
@@ -58,3 +58,4 @@ const KPICards: React.FC<KPICardsProps> = ({
 };
 
 export default KPICards;
+
