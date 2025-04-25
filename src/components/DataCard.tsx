@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { ArrowUpRight, ArrowDownRight, Minus, Clock } from 'lucide-react';
 
 interface DataCardProps {
   title: string;
@@ -11,7 +11,9 @@ interface DataCardProps {
     value: number;
     type: 'increase' | 'decrease' | 'neutral';
   };
+  lastUpdate?: string;
   className?: string;
+  tag?: string;
 }
 
 const DataCard: React.FC<DataCardProps> = ({ 
@@ -19,7 +21,9 @@ const DataCard: React.FC<DataCardProps> = ({
   value, 
   icon, 
   change,
-  className = ""
+  lastUpdate,
+  className = "",
+  tag
 }) => {
   const renderChangeIcon = () => {
     if (!change) return null;
@@ -46,17 +50,33 @@ const DataCard: React.FC<DataCardProps> = ({
   };
   
   return (
-    <Card className={`overflow-hidden transition-all hover:shadow-md ${className}`}>
+    <Card className={`overflow-hidden transition-all hover:shadow-md ${className} ${value === 'نشط' ? 'animate-pulse-soft' : ''}`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium text-gray-500">{title}</CardTitle>
+          <div>
+            <CardTitle className="text-base font-medium text-gray-500">{title}</CardTitle>
+            {tag && (
+              <span className="inline-block px-2 py-1 mt-1 text-xs font-medium rounded-full bg-saudi-green/10 text-saudi-green">
+                {tag}
+              </span>
+            )}
+          </div>
           <div className="p-2 rounded-full bg-saudi-green/10 text-saudi-green">
             {icon}
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-2xl font-bold">
+          {typeof value === 'string' && value === 'نشط' ? (
+            <span className="flex items-center">
+              <span className="inline-block w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+              {value}
+            </span>
+          ) : (
+            value
+          )}
+        </div>
         {change && (
           <div className="flex items-center mt-1 space-x-1 rtl:space-x-reverse">
             {renderChangeIcon()}
@@ -65,6 +85,12 @@ const DataCard: React.FC<DataCardProps> = ({
           </div>
         )}
       </CardContent>
+      {lastUpdate && (
+        <CardFooter className="pt-0 pb-2 text-xs text-gray-500 flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          <span>{lastUpdate}</span>
+        </CardFooter>
+      )}
     </Card>
   );
 };

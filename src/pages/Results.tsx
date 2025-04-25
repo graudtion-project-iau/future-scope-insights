@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Users, MapPin, BarChart2, Clock, Flame, Sparkles } from 'lucide-react';
+import { 
+  Activity, Users, MapPin, BarChart2, Clock, Flame, 
+  Sparkles, Search, Filter, Hash, Database, Bell 
+} from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
@@ -17,6 +20,8 @@ import HighlightedTweet from '@/components/analysis/HighlightedTweet';
 import { get } from '@/api/apiClient';
 import API_ENDPOINTS from '@/api/apiUrls';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
@@ -229,6 +234,8 @@ interface AnalysisOverviewData {
     name: string;
     value: string;
     change?: number;
+    type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime';
+    lastUpdate?: string;
   }[];
   timeline: any[];
   locations: {
@@ -249,7 +256,14 @@ interface AnalysisOverviewData {
   highlightTweets?: {
     earliest?: Tweet;
     mostLiked?: Tweet;
+    latest?: Tweet;
   };
+  hashtags?: {
+    tag: string;
+    count: number;
+    trend: 'increase' | 'decrease' | 'neutral';
+  }[];
+  lastUpdate?: string;
 }
 
 interface TweetSearchResults {
@@ -258,6 +272,65 @@ interface TweetSearchResults {
   pages: number;
   tweets: Tweet[];
 }
+
+const exampleSearches = [
+  {
+    name: "السعودية الأرجنتين",
+    description: "مباراة كأس العالم التاريخية",
+    icon: <Activity className="h-5 w-5" />,
+    color: "bg-green-100",
+    textColor: "text-green-800",
+    borderColor: "border-green-200"
+  },
+  {
+    name: "انفجار الخبر",
+    description: "تحليل الأحداث الفورية",
+    icon: <Bell className="h-5 w-5" />,
+    color: "bg-red-100",
+    textColor: "text-red-800",
+    borderColor: "border-red-200"
+  },
+  {
+    name: "موسم الرياض",
+    description: "تحليل المهرجان السنوي",
+    icon: <Sparkles className="h-5 w-5" />,
+    color: "bg-blue-100",
+    textColor: "text-blue-800",
+    borderColor: "border-blue-200"
+  },
+  {
+    name: "رالي داكار",
+    description: "تحليل المسابقة الرياضية",
+    icon: <BarChart2 className="h-5 w-5" />,
+    color: "bg-amber-100",
+    textColor: "text-amber-800",
+    borderColor: "border-amber-200"
+  },
+  {
+    name: "السياحة في العلا",
+    description: "آراء الزوار والمعالم",
+    icon: <MapPin className="h-5 w-5" />,
+    color: "bg-purple-100",
+    textColor: "text-purple-800",
+    borderColor: "border-purple-200"
+  },
+  {
+    name: "معرض الرياض للكتاب",
+    description: "تغطية وتفاعلات الحدث",
+    icon: <Users className="h-5 w-5" />,
+    color: "bg-cyan-100",
+    textColor: "text-cyan-800",
+    borderColor: "border-cyan-200"
+  }
+];
+
+const trendingHashtags = [
+  { tag: "#السعودية", count: 12500, trend: "increase" as const },
+  { tag: "#الرياض_موسم", count: 8300, trend: "increase" as const },
+  { tag: "#كأس_العالم", count: 7200, trend: "neutral" as const },
+  { tag: "#رؤية_2030", count: 5400, trend: "increase" as const },
+  { tag: "#العلا", count: 4100, trend: "increase" as const }
+];
 
 const Results = () => {
   const location = useLocation();
@@ -279,6 +352,8 @@ const Results = () => {
   
   const isWorldCupMatch = query.toLowerCase().includes("السعودية") && query.toLowerCase().includes("الأرجنتين");
   const isKhobzEvent = query.toLowerCase().includes("انفجار") && query.toLowerCase().includes("الخبر");
+  
+  const [searchStarted, setSearchStarted] = useState(false);
   
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -448,7 +523,11 @@ const Results = () => {
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    navigate(`/results?q=${encodeURIComponent(newQuery)}`);
+    setSearchStarted(true);
+    
+    setTimeout(() => {
+      navigate(`/results?q=${encodeURIComponent(newQuery)}`);
+    }, 800);
   };
 
   const handleFilterChange = (newFilters: any) => {
@@ -480,12 +559,53 @@ const Results = () => {
         <div className="container mx-auto">
           {query ? (
             <>
-              {loading && !overview ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-saudi-green"></div>
+              {loading || searchStarted ? (
+                <div className="flex flex-col justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-saudi-green mb-4"></div>
+                  <p className="text-saudi-green font-medium">جاري تحليل البيانات...</p>
+                  <div className="mt-6 w-full max-w-md">
+                    <div className="h-2 bg-gray-200 rounded">
+                      <div className="h-full bg-saudi-green rounded animate-pulse" style={{width: '60%'}}></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-500">
+                      <span>جمع البيانات</span>
+                      <span>تحليل المشاعر</span>
+                      <span>إنشاء التقرير</span>
+                    </div>
+                  </div>
                 </div>
               ) : overview ? (
                 <>
+                  <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h2 className="text-2xl font-bold">{overview.query}</h2>
+                        <Badge variant="outline" className="bg-saudi-green/10 text-saudi-green">
+                          {overview.total.toLocaleString()} نتيجة
+                        </Badge>
+                      </div>
+                      {overview.lastUpdate && (
+                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>آخر تحديث: {overview.lastUpdate}</span>
+                          {overview.kpis?.find(k => k.type === 'realtime')?.value === 'نشط' && (
+                            <Badge className="bg-green-500 text-white ml-2">تحديث مباشر</Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="flex gap-1 items-center">
+                        <Filter className="h-3 w-3" />
+                        <span>فلترة</span>
+                      </Badge>
+                      <Badge variant="outline" className="flex gap-1 items-center">
+                        <Clock className="h-3 w-3" />
+                        <span>24 ساعة الماضية</span>
+                      </Badge>
+                    </div>
+                  </div>
+
                   <KPICards kpis={overview.kpis} />
                   <ActionButtons />
                   
@@ -495,6 +615,7 @@ const Results = () => {
                       <TabsTrigger value="tweets">التغريدات</TabsTrigger>
                       <TabsTrigger value="sentiment">تحليل المشاعر</TabsTrigger>
                       <TabsTrigger value="influencers">المؤثرين</TabsTrigger>
+                      <TabsTrigger value="hashtags">الهاشتاقات</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="overview" className="space-y-6">
@@ -769,6 +890,42 @@ const Results = () => {
                         </div>
                       </div>
                     </TabsContent>
+                    
+                    <TabsContent value="hashtags">
+                      <div className="dashboard-card">
+                        <h3 className="text-lg font-semibold mb-4">الهاشتاقات الأكثر تداولاً</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                          {(overview.hashtags || trendingHashtags).map((tag, index) => (
+                            <Card key={index} className="text-center hover:shadow-md transition-shadow">
+                              <CardHeader className="pb-2">
+                                <CardTitle className="text-lg font-bold text-saudi-green">
+                                  {tag.tag}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="pb-2">
+                                <p className="text-2xl font-bold">{tag.count.toLocaleString()}</p>
+                                <p className="text-sm text-gray-500">إشارة</p>
+                              </CardContent>
+                              <CardFooter className="pt-0 flex justify-center">
+                                <Badge className={
+                                  tag.trend === 'increase' 
+                                    ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                    : tag.trend === 'decrease' 
+                                      ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                                }>
+                                  {tag.trend === 'increase' 
+                                    ? '↑ متزايد' 
+                                    : tag.trend === 'decrease' 
+                                      ? '↓ متناقص' 
+                                      : '− ثابت'}
+                                </Badge>
+                              </CardFooter>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    </TabsContent>
                   </Tabs>
                 </>
               ) : (
@@ -779,28 +936,67 @@ const Results = () => {
               )}
             </>
           ) : (
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">ابدأ البحث للحصول على تحليلات</h2>
-              <p className="text-gray-500 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
-              <div className="flex justify-center space-x-2 rtl:space-x-reverse">
-                <button 
-                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
-                  onClick={() => handleSearch("السعودية الأرجنتين")}
-                >
-                  جرب: السعودية الأرجنتين
-                </button>
-                <button 
-                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
-                  onClick={() => handleSearch("انفجار الخبر")}
-                >
-                  جرب: انفجار الخبر
-                </button>
-                <button 
-                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
-                  onClick={() => handleSearch("موسم الرياض")}
-                >
-                  جرب: موسم الرياض
-                </button>
+            <div className="text-center py-8">
+              <h2 className="text-2xl font-semibold text-saudi-green mb-4">ابدأ البحث للحصول على تحليلات</h2>
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                استخدم شريط البحث للحصول على تحليلات متعمقة حول أي موضوع، حدث أو هاشتاق. 
+                يمكنك البحث عن أحداث رياضية، فعاليات عامة، أو مواضيع محددة.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto mb-12">
+                {exampleSearches.map((example, index) => (
+                  <Card 
+                    key={index} 
+                    className={`cursor-pointer transition-all hover:shadow-lg ${example.borderColor} border`}
+                    onClick={() => handleSearch(example.name)}
+                  >
+                    <CardHeader className={`${example.color} ${example.textColor} pb-2`}>
+                      <div className="flex items-center gap-2">
+                        {example.icon}
+                        <CardTitle>{example.name}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-3">
+                      <p className="text-gray-600 text-sm">{example.description}</p>
+                    </CardContent>
+                    <CardFooter className="pt-0 pb-3">
+                      <Badge variant="outline" className="bg-white flex gap-1 items-center">
+                        <Search className="h-3 w-3" />
+                        <span>بحث</span>
+                      </Badge>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-sm p-6 border max-w-3xl mx-auto">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Hash className="h-5 w-5 text-saudi-green" />
+                  <span>الهاشتاقات الأكثر بحثاً</span>
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {trendingHashtags.map((tag, index) => (
+                    <div 
+                      key={index}
+                      className="px-3 py-2 rounded-full border flex items-center gap-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => handleSearch(tag.tag)}
+                    >
+                      <span className="font-medium">{tag.tag}</span>
+                      <Badge variant="outline" className="bg-gray-50 text-xs">
+                        {tag.count.toLocaleString()}
+                      </Badge>
+                      <span className={
+                        tag.trend === 'increase' 
+                          ? 'text-green-500' 
+                          : tag.trend === 'decrease' 
+                            ? 'text-red-500' 
+                            : 'text-gray-400'
+                      }>
+                        {tag.trend === 'increase' ? '↑' : tag.trend === 'decrease' ? '↓' : '−'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
