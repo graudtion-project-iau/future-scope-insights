@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Activity, Users, MapPin, BarChart2, Clock, Flame, Sparkles } from 'lucide-react';
@@ -19,7 +18,6 @@ import { get } from '@/api/apiClient';
 import API_ENDPOINTS from '@/api/apiUrls';
 import { useToast } from '@/hooks/use-toast';
 
-// Sample data for demonstration
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
   { date: "2 يناير", إيجابي: 3000, محايد: 1398, سلبي: 2000 },
@@ -30,14 +28,12 @@ const sentimentData = [
   { date: "7 يناير", إيجابي: 3490, محايد: 4300, سلبي: 700 },
 ];
 
-// Updated sentiment distribution without the color property
 const sentimentDistribution = [
   { name: "إيجابي", value: 67 },
   { name: "محايد", value: 23 },
   { name: "سلبي", value: 10 },
 ];
 
-// Updated location data without the color property
 const locationData = [
   { name: "الرياض", value: 45 },
   { name: "العلا", value: 25 },
@@ -59,7 +55,6 @@ const influencerData = [
   { name: "أحمد الشمري", followers: "780K", engagement: "6.2%", image: "https://randomuser.me/api/portraits/men/3.jpg" },
 ];
 
-// Sample tweets
 const sampleTweets: Tweet[] = [
   {
     id: "tweet-1",
@@ -81,7 +76,7 @@ const sampleTweets: Tweet[] = [
   },
   {
     id: "tweet-2",
-    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات الأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
+    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
       name: "أحمد الشمري",
@@ -159,7 +154,6 @@ const sampleTweets: Tweet[] = [
   }
 ];
 
-// Sample tweets for Khobz event
 const khobzTweets: Tweet[] = [
   {
     id: "khobz-1",
@@ -283,7 +277,6 @@ const Results = () => {
     sentiment: ['positive', 'neutral', 'negative']
   });
   
-  // Load sample data for Saudi Arabia vs Argentina when the query contains related keywords
   const isWorldCupMatch = query.toLowerCase().includes("السعودية") && query.toLowerCase().includes("الأرجنتين");
   const isKhobzEvent = query.toLowerCase().includes("انفجار") && query.toLowerCase().includes("الخبر");
   
@@ -300,9 +293,7 @@ const Results = () => {
   const fetchAnalysisData = async (searchQuery: string) => {
     setLoading(true);
     try {
-      // Use pre-populated data for demo purposes
       if (isWorldCupMatch) {
-        // For Saudi Arabia vs Argentina match
         setOverview({
           query: searchQuery,
           total: 15423,
@@ -333,7 +324,6 @@ const Results = () => {
           tweets: sampleTweets
         });
       } else if (isKhobzEvent) {
-        // For Khobz explosion event
         setOverview({
           query: searchQuery,
           total: 3250,
@@ -354,9 +344,9 @@ const Results = () => {
             { date: "19:00", إيجابي: 500, محايد: 1500, سلبي: 250 }
           ],
           locations: [
-            { name: "الخبر", value: 60, color: "#2196F3" },
-            { name: "بقيق", value: 25, color: "#9C27B0" },
-            { name: "الظهران", value: 15, color: "#3F51B5" }
+            { name: "الخبر", value: 60 },
+            { name: "بقيق", value: 25 },
+            { name: "الظهران", value: 15 }
           ],
           keywords: [
             { keyword: "تمرين", count: 340, trend: "increase" },
@@ -381,7 +371,6 @@ const Results = () => {
           tweets: khobzTweets
         });
       } else {
-        // API call for other queries
         const endpoint = `${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(searchQuery)}`;
         const data = await get<{ data: AnalysisOverviewData }>(endpoint);
         
@@ -413,7 +402,6 @@ const Results = () => {
       const currentFilters = newFilters || filters;
       
       if (isWorldCupMatch) {
-        // For Saudi Arabia vs Argentina match - just use sample data
         setTweetResults({
           total: sampleTweets.length,
           page: 1,
@@ -421,7 +409,6 @@ const Results = () => {
           tweets: sampleTweets
         });
       } else if (isKhobzEvent) {
-        // For Khobz explosion event - use sample data
         setTweetResults({
           total: khobzTweets.length,
           page: 1,
@@ -429,7 +416,6 @@ const Results = () => {
           tweets: khobzTweets
         });
       } else {
-        // Normal API call for other queries
         const filterParams = [
           `query=${encodeURIComponent(searchQuery)}`,
           `page=${page}`,
