@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import SearchBar from '@/components/SearchBar';
+import KPICards from '@/components/results/KPICards';
 import { sampleReports } from '@/components/data/sampleReports';
 
 const Home = () => {
@@ -44,9 +45,9 @@ const Home = () => {
                 <span>جرب: </span>
                 <button onClick={() => handleSearch("السعودية الأرجنتين")} className="hover:text-saudi-green">السعودية الأرجنتين</button>
                 <span>•</span>
-                <button onClick={() => handleSearch("موسم الرياض")} className="hover:text-saudi-green">موسم الرياض</button>
+                <button onClick={() => handleSearch("انفجار الخبر")} className="hover:text-saudi-green">انفجار الخبر</button>
                 <span>•</span>
-                <button onClick={() => handleSearch("F1 Saudi Grand Prix")} className="hover:text-saudi-green">F1 Saudi Grand Prix</button>
+                <button onClick={() => handleSearch("موسم الرياض")} className="hover:text-saudi-green">موسم الرياض</button>
               </div>
             </div>
           </div>
@@ -54,6 +55,8 @@ const Home = () => {
 
         <section className="py-16 px-4">
           <div className="container mx-auto">
+            <KPICards />
+            
             <div className="mt-12">
               <h2 className="text-2xl font-bold mb-6 text-center">أحداث حقيقية تم تحليلها</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -64,7 +67,7 @@ const Home = () => {
                       <p className="text-gray-600 mb-4 line-clamp-3">{report.description}</p>
                       
                       <div className="grid grid-cols-2 gap-4 mb-4">
-                        {Object.entries(report.metrics).map(([key, value], idx) => (
+                        {Object.entries(report.metrics).slice(0, 4).map(([key, value], idx) => (
                           <div key={idx} className="bg-gray-50 p-3 rounded-lg">
                             <div className="text-lg font-semibold text-saudi-green">{value}</div>
                             <div className="text-sm text-gray-500">{key}</div>

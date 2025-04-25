@@ -4,7 +4,6 @@ import { Activity, Users, MapPin, BarChart2, Clock, Flame, Sparkles, ArrowRight 
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SEO from '@/components/SEO';
 import SearchBar from '@/components/SearchBar';
 import LineChart from '@/components/charts/LineChart';
 import PieChart from '@/components/charts/PieChart';
@@ -20,7 +19,6 @@ import { get } from '@/api/apiClient';
 import API_ENDPOINTS from '@/api/apiUrls';
 import { useToast } from '@/hooks/use-toast';
 import { sampleReports } from '@/components/data/sampleReports';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
@@ -80,7 +78,7 @@ const sampleTweets: Tweet[] = [
   },
   {
     id: "tweet-2",
-    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات ال��رجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
+    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات الأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
       name: "أحمد الشمري",
@@ -339,7 +337,7 @@ const Results = () => {
           kpis: [
             { name: "متوسط المشاعر", value: "+0.10", change: -5 },
             { name: "عدد الإشارات", value: "3,250", change: 58 },
-            { name: "الموقع الرئيسي", value: "الخب��" },
+            { name: "الموقع الرئيسي", value: "الخبر" },
             { name: "عدد المؤثرين", value: "12", change: 7 }
           ],
           timeline: [
@@ -481,7 +479,7 @@ const Results = () => {
         <div className="container mx-auto">
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">التقارير</h1>
-            <p className="text-gray-600">{query ? `استعلام: "${query}"` : 'تقارير مختارة'}</p>
+            <p className="text-gray-600">{query ? `استعلام: "${query}"` : 'استخدم شريط البحث للحصول على تحليلات'}</p>
           </div>
           <SearchBar onSearch={handleSearch} />
         </div>
@@ -749,43 +747,74 @@ const Results = () => {
                     </TabsContent>
                   </Tabs>
                 </>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-600 mb-4">لم يتم العثور على نتائج لـ "{query}"</p>
-                  <Button onClick={() => navigate('/')}>
-                    الرجوع للصفحة الرئيسية
-                  </Button>
-                </div>
-              )}
+              ) : null}
             </>
           ) : (
-            <div className="container mx-auto py-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {sampleReports.map((report, index) => (
-                  <Card key={index} className="overflow-hidden hover:shadow-md transition-all duration-300">
-                    <CardHeader className="pb-3">
-                      <h3 className="text-lg font-bold">{report.title}</h3>
-                    </CardHeader>
-                    <CardContent className="pb-0">
-                      <p className="text-gray-600 text-sm">{report.description}</p>
-                    </CardContent>
-                    <CardFooter className="pt-4 pb-4 flex justify-end">
-                      <Button 
-                        variant="default" 
-                        className="flex items-center gap-2" 
-                        onClick={() => handleSearch(report.title)}
-                      >
-                        عرض التقرير
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
+            <div className="py-8">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-2">ابدأ البحث للحصول على تحليلات</h2>
+                <p className="text-gray-600 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
+                
+                <div className="flex flex-wrap justify-center gap-3 mb-8">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSearch("السعودية الأرجنتين")}
+                    className="flex items-center gap-2"
+                  >
+                    جرب: السعودية الأرجنتين
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSearch("انفجار الخبر")}
+                    className="flex items-center gap-2"
+                  >
+                    جرب: انفجار الخبر
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSearch("موسم الرياض")}
+                    className="flex items-center gap-2"
+                  >
+                    جرب: موسم الرياض
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <h3 className="text-xl font-bold mb-4">أحداث حقيقية تم تحليلها</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sampleReports.slice(0, 3).map((report, index) => (
+                  <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                    <h3 className="text-lg font-bold mb-2">{report.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{report.description}</p>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      {Object.entries(report.metrics).map(([key, value], i) => (
+                        <div key={i} className="bg-gray-50 p-2 rounded">
+                          <div className="text-xs text-gray-500">{key}</div>
+                          <div className="font-bold">{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => handleSearch(report.title)}
+                    >
+                      عرض التقرير
+                    </Button>
+                  </div>
                 ))}
               </div>
             </div>
           )}
         </div>
       </section>
+      
       <Footer />
     </div>
   );
