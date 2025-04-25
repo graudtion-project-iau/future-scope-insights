@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Users, MapPin, BarChart2, Clock, Flame, Sparkles, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Activity, Users, MapPin, BarChart2, Clock, Flame, Sparkles } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
@@ -18,7 +17,6 @@ import HighlightedTweet from '@/components/analysis/HighlightedTweet';
 import { get } from '@/api/apiClient';
 import API_ENDPOINTS from '@/api/apiUrls';
 import { useToast } from '@/hooks/use-toast';
-import { sampleReports } from '@/components/data/sampleReports';
 
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
@@ -78,7 +76,7 @@ const sampleTweets: Tweet[] = [
   },
   {
     id: "tweet-2",
-    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات الأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
+    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
       name: "أحمد الشمري",
@@ -464,13 +462,6 @@ const Results = () => {
     fetchTweets(query, page);
   };
 
-  const getRandomReports = () => {
-    const shuffled = [...sampleReports].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3);
-  };
-  
-  const randomReports = getRandomReports();
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
@@ -478,7 +469,7 @@ const Results = () => {
       <section className="pt-24 pb-6 px-4 bg-white border-b">
         <div className="container mx-auto">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">التقارير</h1>
+            <h1 className="text-2xl font-bold mb-2">نتائج البحث</h1>
             <p className="text-gray-600">{query ? `استعلام: "${query}"` : 'استخدم شريط البحث للحصول على تحليلات'}</p>
           </div>
           <SearchBar onSearch={handleSearch} />
@@ -495,6 +486,7 @@ const Results = () => {
                 </div>
               ) : overview ? (
                 <>
+                  <KPICards kpis={overview.kpis} />
                   <ActionButtons />
                   
                   <Tabs defaultValue="overview" className="mb-8">
@@ -741,79 +733,81 @@ const Results = () => {
                     
                     <TabsContent value="influencers">
                       <div className="dashboard-card">
-                        <h3 className="text-lg font-semibold mb-4">أبرز المؤثرين</h3>
-                        <InfluencersList data={overview.influencers} />
+                        <h3 className="text-lg font-semibold mb-4">المؤثرين</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {overview.influencers.map((influencer, index) => (
+                            <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                              <div className="flex items-center gap-3">
+                                <img 
+                                  src={influencer.image || `https://randomuser.me/api/portraits/${index % 2 ? 'women' : 'men'}/${index + 1}.jpg`}
+                                  alt={influencer.name}
+                                  className="h-12 w-12 rounded-full object-cover border-2 border-saudi-green"
+                                />
+                                <div>
+                                  <p className="font-semibold">{influencer.name}</p>
+                                  <div className="flex items-center gap-3 text-sm text-gray-500">
+                                    <span>{influencer.followers} متابع</span>
+                                    <span>{influencer.engagement} تفاعل</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {tweetResults?.tweets
+                                .filter(t => t.user.name === influencer.name)
+                                .slice(0, 1)
+                                .map(tweet => (
+                                  <div key={tweet.id} className="mt-3 pt-3 border-t">
+                                    <p className="text-sm line-clamp-2">{tweet.text}</p>
+                                    <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                      <span>{tweet.likes.toLocaleString()} إعجاب</span>
+                                      <span>{tweet.retweets.toLocaleString()} إعادة تغريد</span>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </TabsContent>
                   </Tabs>
                 </>
-              ) : null}
+              ) : (
+                <div className="text-center py-12">
+                  <h2 className="text-xl font-semibold text-gray-700 mb-2">لم يتم العثور على نتائج</h2>
+                  <p className="text-gray-500 mb-6">جرب استعلامًا آخر أو راجع صياغة البحث الخاص بك</p>
+                </div>
+              )}
             </>
           ) : (
-            <div className="py-8">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold mb-2">ابدأ البحث للحصول على تحليلات</h2>
-                <p className="text-gray-600 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
-                
-                <div className="flex flex-wrap justify-center gap-3 mb-8">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => handleSearch("السعودية الأرجنتين")}
-                    className="flex items-center gap-2"
-                  >
-                    جرب: السعودية الأرجنتين
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => handleSearch("انفجار الخبر")}
-                    className="flex items-center gap-2"
-                  >
-                    جرب: انفجار الخبر
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => handleSearch("موسم الرياض")}
-                    className="flex items-center gap-2"
-                  >
-                    جرب: موسم الرياض
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <h3 className="text-xl font-bold mb-4">أحداث حقيقية تم تحليلها</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sampleReports.slice(0, 3).map((report, index) => (
-                  <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                    <h3 className="text-lg font-bold mb-2">{report.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{report.description}</p>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      {Object.entries(report.metrics).map(([key, value], i) => (
-                        <div key={i} className="bg-gray-50 p-2 rounded">
-                          <div className="text-xs text-gray-500">{key}</div>
-                          <div className="font-bold">{value}</div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => handleSearch(report.title)}
-                    >
-                      عرض التقرير
-                    </Button>
-                  </div>
-                ))}
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">ابدأ البحث للحصول على تحليلات</h2>
+              <p className="text-gray-500 mb-6">استخدم شريط البحث في الأعلى لإدخال استعلامك</p>
+              <div className="flex justify-center space-x-2 rtl:space-x-reverse">
+                <button 
+                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
+                  onClick={() => handleSearch("السعودية الأرجنتين")}
+                >
+                  جرب: السعودية الأرجنتين
+                </button>
+                <button 
+                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
+                  onClick={() => handleSearch("انفجار الخبر")}
+                >
+                  جرب: انفجار الخبر
+                </button>
+                <button 
+                  className="px-3 py-1 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-saudi-green hover:text-white hover:border-saudi-green transition-all shadow-sm"
+                  onClick={() => handleSearch("موسم الرياض")}
+                >
+                  جرب: موسم الرياض
+                </button>
               </div>
             </div>
           )}
         </div>
       </section>
+      
+      <div className="flex-grow"></div>
       
       <Footer />
     </div>
