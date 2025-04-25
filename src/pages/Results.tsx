@@ -81,7 +81,7 @@ const sampleTweets: Tweet[] = [
   },
   {
     id: "tweet-2",
-    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثاني. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
+    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثان��. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
       name: "أحمد الشمري",
@@ -902,7 +902,7 @@ const Results = () => {
                                   {tag.tag}
                                 </CardTitle>
                               </CardHeader>
-                              <CardContent className="pb-2">
+                              <CardContent className="pt-3">
                                 <p className="text-2xl font-bold">{tag.count.toLocaleString()}</p>
                                 <p className="text-sm text-gray-500">إشارة</p>
                               </CardContent>
