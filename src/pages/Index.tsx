@@ -7,7 +7,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import SearchBar from '@/components/SearchBar';
-import KPICards from '@/components/results/KPICards';
 import { sampleReports } from '@/components/data/sampleReports';
 
 const Home = () => {
@@ -55,8 +54,6 @@ const Home = () => {
 
         <section className="py-16 px-4">
           <div className="container mx-auto">
-            <KPICards />
-            
             <div className="mt-12">
               <h2 className="text-2xl font-bold mb-6 text-center">أحداث حقيقية تم تحليلها</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,7 +64,7 @@ const Home = () => {
                       <p className="text-gray-600 mb-4 line-clamp-3">{report.description}</p>
                       
                       <div className="grid grid-cols-2 gap-4 mb-4">
-                        {Object.entries(report.metrics).slice(0, 4).map(([key, value], idx) => (
+                        {Object.entries(report.metrics).map(([key, value], idx) => (
                           <div key={idx} className="bg-gray-50 p-3 rounded-lg">
                             <div className="text-lg font-semibold text-saudi-green">{value}</div>
                             <div className="text-sm text-gray-500">{key}</div>
