@@ -44,9 +44,9 @@ const Home = () => {
                 <span>جرب: </span>
                 <button onClick={() => handleSearch("السعودية الأرجنتين")} className="hover:text-saudi-green">السعودية الأرجنتين</button>
                 <span>•</span>
-                <button onClick={() => handleSearch("انفجار الخبر")} className="hover:text-saudi-green">انفجار الخبر</button>
-                <span>•</span>
                 <button onClick={() => handleSearch("موسم الرياض")} className="hover:text-saudi-green">موسم الرياض</button>
+                <span>•</span>
+                <button onClick={() => handleSearch("F1 Saudi Grand Prix")} className="hover:text-saudi-green">F1 Saudi Grand Prix</button>
               </div>
             </div>
           </div>
