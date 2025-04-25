@@ -2,50 +2,31 @@
 interface SampleReport {
   title: string;
   description: string;
-  metrics: {
-    [key: string]: string;
-  };
 }
 
 export const sampleReports: SampleReport[] = [
   {
     title: "السعودية الأرجنتين",
-    description: "تحليل شامل لتفاعلات الجمهور حول مباراة السعودية والأرجنتين في كأس العالم",
-    metrics: {
-      "المشاعر": "+0.82",
-      "الإشارات": "125K",
-      "التفاعل": "93%",
-      "المؤثرين": "1.2K"
-    }
+    description: "تحليل شامل لتفاعلات الجمهور حول مباراة السعودية والأرجنتين في كأس العالم"
   },
   {
-    title: "انفجار الخبر",
-    description: "تحليل التفاعلات والأخبار حول حادثة انفجار الخبر وتداعياتها على وسائل التواصل",
-    metrics: {
-      "المشاعر": "-0.31",
-      "الإشارات": "45K",
-      "التفاعل": "87%",
-      "المؤثرين": "820"
-    }
+    title: "Superbowl LVIII",
+    description: "Analysis of social media engagement during Super Bowl LVIII between Kansas City Chiefs and San Francisco 49ers"
   },
   {
-    title: "موسم الرياض",
-    description: "رصد وتحليل التفاعلات حول فعاليات وأنشطة موسم الرياض",
-    metrics: {
-      "المشاعر": "+0.75",
-      "الإشارات": "89K",
-      "التفاعل": "91%",
-      "المؤثرين": "2.1K"
-    }
+    title: "موسم الرياض 2024",
+    description: "رصد وتحليل التفاعلات حول فعاليات وأنشطة موسم الرياض"
   },
   {
-    title: "نهائي كأس الملك",
-    description: "تحليل تفاعلات الجماهير خلال المباراة النهائية لكأس خادم الحرمين الشريفين",
-    metrics: {
-      "المشاعر": "+0.68",
-      "الإشارات": "78K",
-      "التفاعل": "89%",
-      "المؤثرين": "950"
-    }
+    title: "US Elections 2024",
+    description: "Comprehensive analysis of social media discussions around the 2024 US Presidential Elections"
+  },
+  {
+    title: "Saudi National Day 2024",
+    description: "Analysis of social media celebrations and engagement during the Saudi National Day"
+  },
+  {
+    title: "COP28 Dubai",
+    description: "Social media sentiment analysis of discussions around climate change during COP28 in Dubai"
   }
 ];
