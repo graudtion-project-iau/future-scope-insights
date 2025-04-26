@@ -55,7 +55,137 @@ Authentication is done via OTP (One-Time Password) sent to mobile numbers.
 }
 ```
 
-## Search API
+## Multi-Stage Search Process
+
+The search process is divided into three stages to provide real-time feedback and updates:
+
+### Stage 1: Initial Search
+- **Endpoint**: `/search`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "query": "موسم الرياض",
+  "filters": {
+    "from": "2023-01-01",
+    "to": "2023-12-31",
+    "source": ["twitter", "news"],
+    "language": "ar"
+  }
+}
+```
+- **Response**:
+```json
+{
+  "success": true,
+  "message": "Search initiated",
+  "data": {
+    "searchId": "search-123456",
+    "estimatedTime": 15, // seconds
+    "status": "searching"
+  }
+}
+```
+
+### Stage 2: Check Search Status
+- **Endpoint**: `/search/status`
+- **Method**: `GET`
+- **Parameters**:
+  - `searchId`: ID of the search operation
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "searchId": "search-123456",
+    "status": "analyzing", // "searching", "analyzing", "preparing", "completed", "error"
+    "progress": 45, // percentage (0-100)
+    "message": "Analyzing sentiment and trends",
+    "estimatedCompletion": 10, // seconds remaining
+    "tweetsFound": 5243,
+    "error": null // present only if status is "error"
+  }
+}
+```
+
+### Stage 3: Retrieve Analysis Results
+- **Endpoint**: `/analysis/overview`
+- **Method**: `GET`
+- **Parameters**:
+  - `searchId`: ID of the search operation
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "query": "موسم الرياض",
+    "total": 35842,
+    "sentiment": {
+      "positive": 72,
+      "neutral": 21,
+      "negative": 7
+    },
+    "kpis": [
+      { "name": "متوسط المشاعر", "value": "+0.78", "change": 15 },
+      { "name": "عدد الإشارات", "value": "35,842", "change": 25 },
+      { "name": "الموقع الرئيسي", "value": "الرياض" },
+      { "name": "عدد المؤثرين", "value": "47", "change": 12 }
+    ],
+    "timeline": [
+      { "date": "أسبوع 1", "positive": 5200, "neutral": 1800, "negative": 700 },
+      // More timeline data...
+    ],
+    "locations": [
+      { "name": "الرياض", "value": 68 },
+      { "name": "جدة", "value": 12 },
+      // More location data...
+    ],
+    "keywords": [
+      { "keyword": "فعاليات", "count": 4280, "trend": "increase" },
+      { "keyword": "حفلات", "count": 3750, "trend": "increase" },
+      // More keywords...
+    ],
+    "influencers": [
+      { 
+        "name": "هيئة الترفيه", 
+        "followers": "2.4M", 
+        "engagement": "6.7%", 
+        "image": "https://example.com/image.jpg" 
+      },
+      // More influencers...
+    ],
+    "hashtags": [
+      { "tag": "#موسم_الرياض", "count": 18500, "trend": "increase" },
+      { "tag": "#RiyadhSeason", "count": 12300, "trend": "increase" },
+      // More hashtags...
+    ],
+    "lastUpdate": "15:30 - 26 أبريل 2025"
+  }
+}
+```
+
+### Cancel Search
+- **Endpoint**: `/search/cancel`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "searchId": "search-123456"
+}
+```
+- **Response**:
+```json
+{
+  "success": true,
+  "message": "Search cancelled successfully",
+  "data": {
+    "searchId": "search-123456",
+    "status": "cancelled"
+  }
+}
+```
+
+## Standard Search API
 
 ### Search Query
 - **Endpoint**: `/search`
@@ -168,6 +298,7 @@ Authentication is done via OTP (One-Time Password) sent to mobile numbers.
   - `query`: Search query
   - `from`: Start date
   - `to`: End date
+  - `searchId`: ID from a multi-stage search (optional)
 - **Response**:
 ```json
 {
@@ -209,7 +340,13 @@ Authentication is done via OTP (One-Time Password) sent to mobile numbers.
         "image": "https://randomuser.me/api/portraits/men/1.jpg" 
       },
       // More influencers...
-    ]
+    ],
+    "hashtags": [
+      { "tag": "#السعودية_الأرجنتين", "count": 18500, "trend": "increase" },
+      { "tag": "#WorldCup2022", "count": 12300, "trend": "increase" },
+      // More hashtags...
+    ],
+    "lastUpdate": "13:45 - 22 نوفمبر 2022"
   }
 }
 ```
@@ -221,6 +358,7 @@ Authentication is done via OTP (One-Time Password) sent to mobile numbers.
   - `query`: Search query
   - `from`: Start date
   - `to`: End date
+  - `searchId`: ID from a multi-stage search (optional)
 - **Response**:
 ```json
 {
@@ -245,103 +383,13 @@ Authentication is done via OTP (One-Time Password) sent to mobile numbers.
 }
 ```
 
-### Tweets Analysis
-- **Endpoint**: `/analysis/tweets`
+### Export Analysis
+- **Endpoint**: `/analysis/export`
 - **Method**: `GET`
 - **Parameters**:
-  - `query`: Search query
-  - `from`: Start date
-  - `to`: End date
-  - `sort`: Sort order (recent, popular)
-  - `filter`: Filter type (media, verified)
-  - `page`: Page number
-  - `limit`: Results per page
-- **Response**:
-```json
-{
-  "success": true,
-  "data": {
-    "query": "السعودية الأرجنتين",
-    "total": 15423,
-    "page": 1,
-    "pages": 772,
-    "tweets": [
-      {
-        "id": "tweet-123",
-        "text": "مباراة تاريخية للمنتخب السعودي ضد الأرجنتين",
-        "user": {
-          "id": "user-456",
-          "name": "محمد السعيد",
-          "username": "@msaeed",
-          "profileImage": "https://example.com/profile.jpg",
-          "verified": true,
-          "followers": 125000
-        },
-        "date": "2022-11-22T13:45:28Z",
-        "likes": 5420,
-        "retweets": 1230,
-        "quotes": 342,
-        "replies": 248,
-        "sentiment": "positive",
-        "media": [
-          {
-            "type": "image",
-            "url": "https://example.com/image.jpg"
-          }
-        ]
-      }
-      // More tweets...
-    ],
-    "highlights": {
-      "earliest": {
-        "id": "tweet-100",
-        "text": "بدأت مباراة السعودية والأرجنتين للتو",
-        "date": "2022-11-22T12:00:00Z"
-      },
-      "mostLiked": {
-        "id": "tweet-200",
-        "text": "السعودية تحقق المفاجأة وتهزم الأرجنتين 2-1",
-        "likes": 125000
-      }
-    }
-  }
-}
-```
-
-### Influencers Analysis
-- **Endpoint**: `/analysis/influencers`
-- **Method**: `GET`
-- **Parameters**:
-  - `query`: Search query
-  - `from`: Start date
-  - `to`: End date
-- **Response**:
-```json
-{
-  "success": true,
-  "data": {
-    "query": "السعودية الأرجنتين",
-    "influencers": [
-      {
-        "id": "user-123",
-        "name": "محمد السعيد",
-        "username": "@msaeed",
-        "profileImage": "https://example.com/profile.jpg",
-        "verified": true,
-        "followers": "1.2M",
-        "engagement": "5.4%",
-        "tweets": 12,
-        "topTweet": {
-          "id": "tweet-456",
-          "text": "ألف مبروك للمنتخب السعودي على هذا الإنجاز العظيم",
-          "likes": 45000
-        }
-      }
-      // More influencers...
-    ]
-  }
-}
-```
+  - `searchId`: ID of the search operation
+  - `format`: Export format (pdf, excel, json)
+- **Response**: Binary file download
 
 ## Tweet API
 
@@ -558,6 +606,102 @@ Authentication is done via OTP (One-Time Password) sent to mobile numbers.
       "whatsapp": true
     },
     "frequency": "daily"
+  }
+}
+```
+
+## Future Vision Agent API
+
+### Generate Analysis Report
+- **Endpoint**: `/agent/analyze`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "searchId": "search-123456",
+  "depth": "standard", // "brief", "standard", "detailed"
+  "focus": ["sentiment", "influencers", "trends"],
+  "language": "ar"
+}
+```
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "reportId": "report-789",
+    "searchId": "search-123456",
+    "generationStatus": "in_progress", // "in_progress", "completed", "failed"
+    "estimatedCompletion": 30 // seconds
+  }
+}
+```
+
+### Get Analysis Report
+- **Endpoint**: `/agent/report/{reportId}`
+- **Method**: `GET`
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "reportId": "report-789",
+    "searchId": "search-123456",
+    "status": "completed",
+    "title": "تحليل موسم الرياض",
+    "summary": "تحليل شامل للتفاعلات على وسائل التواصل الاجتماعي حول موسم الرياض...",
+    "sections": [
+      {
+        "title": "الرأي العام",
+        "content": "يظهر التحليل توجهاً إيجابياً نحو فعاليات موسم الرياض حيث بلغت نسبة المشاعر الإيجابية 72%...",
+        "visualKey": "sentiment_pie"
+      },
+      {
+        "title": "المؤثرون الرئيسيون",
+        "content": "كان للحسابات الرسمية مثل هيئة الترفيه وحساب موسم الرياض التأثير الأكبر...",
+        "visualKey": "influencers_table"
+      }
+      // More sections...
+    ],
+    "recommendations": [
+      "زيادة التواصل حول موضوع تذاكر الفعاليات لمعالجة المخاوف من الأسعار المرتفعة",
+      "التركيز على قصص النجاح من الفعاليات السابقة"
+      // More recommendations...
+    ],
+    "createdAt": "2025-04-26T16:30:00Z"
+  }
+}
+```
+
+### Agent Query
+- **Endpoint**: `/agent/query`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "searchId": "search-123456",
+  "query": "ما هي أبرز الفعاليات التي حظيت بردود فعل إيجابية؟",
+  "context": "trends"
+}
+```
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "answer": "بناءً على تحليل البيانات، فإن أبرز الفعاليات التي حظيت بردود فعل إيجابية هي: 1) الحفلات الموسيقية في بوليفارد رياض حيث بلغت نسبة المشاعر الإيجابية 85%، 2) عروض المسرح العالمي بنسبة 78% إيجابية، 3) فعاليات الألعاب والترفيه العائلية بنسبة 72% إيجابية.",
+    "relatedData": {
+      "visualType": "bar_chart",
+      "data": [
+        { "name": "الحفلات الموسيقية", "value": 85 },
+        { "name": "عروض المسرح", "value": 78 },
+        { "name": "فعاليات عائلية", "value": 72 }
+      ]
+    },
+    "relatedQueries": [
+      "ما هي أكثر الفعاليات التي واجهت انتقادات؟",
+      "ما هي اقتراحات الجمهور لتحسين الفعاليات؟"
+    ]
   }
 }
 ```

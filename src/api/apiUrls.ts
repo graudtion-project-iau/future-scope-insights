@@ -16,6 +16,8 @@ const API_ENDPOINTS = {
     suggestions: '/search/suggestions',
     trending: '/search/trending',
     filter: '/search/filter',
+    status: '/search/status', // New endpoint to check search status
+    cancel: '/search/cancel',  // New endpoint to cancel an ongoing search
   },
   
   // Analysis related endpoints
@@ -27,6 +29,7 @@ const API_ENDPOINTS = {
     influencers: '/analysis/influencers',
     timeline: '/analysis/timeline',
     location: '/analysis/location',
+    export: '/analysis/export',  // New endpoint for exporting analysis
   },
   
   // User related endpoints
@@ -35,6 +38,7 @@ const API_ENDPOINTS = {
     interests: '/user/interests',
     preferences: '/user/preferences',
     saved: '/user/saved',
+    history: '/user/history',  // New endpoint for search history
   },
   
   // Reports related endpoints
@@ -65,7 +69,7 @@ const API_ENDPOINTS = {
 
 // Function to generate full API URLs
 export const apiUrl = (endpoint: string): string => {
-  return `https://Futvi.com/api${endpoint}`;
+  return `${API_URL_BASE}${endpoint}`;
 };
 
 export default API_ENDPOINTS;
