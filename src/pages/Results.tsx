@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -332,96 +331,24 @@ const Results = () => {
         }
       }
 
-      if (isWorldCupMatch) {
-        setOverview({
-          query: searchQuery,
-          total: 15423,
-          sentiment: {
-            positive: 67,
-            neutral: 23,
-            negative: 10,
-          },
-          kpis: [
-            { name: "متوسط المشاعر", value: "+0.67", change: 12 },
-            { name: "عدد الإشارات", value: "15,423", change: 5 },
-            { name: "الموقع الرئيسي", value: "الرياض" },
-            { name: "عدد المؤثرين", value: "24", change: -3 }
-          ],
-          timeline: sentimentData,
-          locations: locationData,
-          keywords: keywordData,
-          influencers: influencerData,
-          highlightTweets: {
-            earliest: sampleTweets[4],
-            mostLiked: sampleTweets[0]
-          }
-        });
+      const endpoint = `${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(searchQuery)}`;
+      const response = await get<APIAnalysisResponse>(endpoint);
+      
+      if (response?.data) {
+        const transformedData = transformAnalysisData(response.data);
+        setOverview(transformedData);
         setTweetResults({
-          total: sampleTweets.length,
+          total: response.data.detailed_analysis.length,
           page: 1,
           pages: 1,
-          tweets: sampleTweets
-        });
-      } else if (isKhobzEvent) {
-        setOverview({
-          query: searchQuery,
-          total: 3250,
-          sentiment: {
-            positive: 20,
-            neutral: 70,
-            negative: 10,
-          },
-          kpis: [
-            { name: "متوسط المشاعر", value: "+0.10", change: -5 },
-            { name: "عدد الإشارات", value: "3,250", change: 58 },
-            { name: "الموقع الرئيسي", value: "الخبر" },
-            { name: "عدد المؤثرين", value: "12", change: 7 }
-          ],
-          timeline: [
-            { date: "18:30", إيجابي: 200, محايد: 1200, سلبي: 600 },
-            { date: "18:45", إيجابي: 300, محايد: 1800, سلبي: 400 },
-            { date: "19:00", إيجابي: 500, محايد: 1500, سلبي: 250 }
-          ],
-          locations: [
-            { name: "الخبر", value: 60 },
-            { name: "بقيق", value: 25 },
-            { name: "الظهران", value: 15 }
-          ],
-          keywords: [
-            { keyword: "تمرين", count: 340, trend: "increase" },
-            { keyword: "أمني", count: 285, trend: "increase" },
-            { keyword: "اطمئنان", count: 142, trend: "neutral" },
-            { keyword: "دفاع مدني", count: 118, trend: "increase" },
-            { keyword: "شائعات", count: 96, trend: "decrease" }
-          ],
-          influencers: [
-            { name: "فهد المطيري", followers: "500K", engagement: "5.5%", image: "https://randomuser.me/api/portraits/men/3.jpg" },
-            { name: "نورة السعد", followers: "300K", engagement: "4.8%", image: "https://randomuser.me/api/portraits/women/2.jpg" }
-          ],
-          highlightTweets: {
-            earliest: khobzTweets[0],
-            mostLiked: khobzTweets[2]
-          }
-        });
-        setTweetResults({
-          total: khobzTweets.length,
-          page: 1,
-          pages: 1,
-          tweets: khobzTweets
+          tweets: transformedData.tweets || []
         });
       } else {
-        const endpoint = `${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(searchQuery)}`;
-        const data = await get<{ data: AnalysisOverviewData }>(endpoint);
-        
-        if (data?.data) {
-          setOverview(data.data);
-        } else {
-          toast({
-            title: "خطأ في تحميل البيانات",
-            description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "خطأ في تحميل البيانات",
+          description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching analysis data:", error);
