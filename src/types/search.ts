@@ -81,3 +81,5 @@ export interface ExampleSearch {
   textColor: string;
   borderColor: string;
 }
+
+export type TrendType = 'increase' | 'decrease' | 'neutral';

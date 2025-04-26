@@ -70,7 +70,7 @@ const SearchProgressBar: React.FC<SearchProgressBarProps> = ({ searchProgress, c
         indicatorClassName={progressColor}
       />
       
-      {searchProgress.stage !== 'idle' && searchProgress.stage !== 'completed' && searchProgress.stage !== 'error' && (
+      {(searchProgress.stage === 'searching' || searchProgress.stage === 'analyzing' || searchProgress.stage === 'preparing') && (
         <div className="text-sm text-gray-600 italic text-center animate-fade-in mt-2">
           "{currentQuote}"
         </div>
