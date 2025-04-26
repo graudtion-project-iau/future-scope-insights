@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -27,6 +26,7 @@ import TrendBadge from '@/components/results/TrendBadge';
 import { AnalysisOverviewData, TweetSearchResults, TrendType, ExampleSearch } from '@/types/search';
 import SearchProgressBar from '@/components/search/SearchProgress';
 import { SearchProgress, SearchStage } from '@/utils/searchStages';
+import { isSampleQuery, getSampleData, getSampleTweets } from '@/utils/sampleSearchData';
 
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
@@ -86,7 +86,7 @@ const sampleTweets: Tweet[] = [
   },
   {
     id: "tweet-2",
-    text: "الأداء الدفاعي للسعودية كان رائعاً ��ي الشوط الثان��. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
+    text: "الأداء الدفاعي للسعودية كان رائعاً ي الشوط الثان. استطاعوا صد هجمات لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
       name: "أحمد الشمري",
@@ -322,6 +322,15 @@ const Results = () => {
   const fetchAnalysisData = async (searchQuery: string) => {
     setLoading(true);
     try {
+      if (isSampleQuery(searchQuery)) {
+        const sampleData = getSampleData(searchQuery);
+        if (sampleData) {
+          setOverview(sampleData);
+          setTweetResults(getSampleTweets(searchQuery));
+          return;
+        }
+      }
+
       if (isWorldCupMatch) {
         setOverview({
           query: searchQuery,
@@ -718,230 +727,4 @@ const Results = () => {
                                             {tweet.user.verified && (
                                               <span className="text-blue-500">
                                                 <svg className="h-4 w-4 inline" viewBox="0 0 24 24" fill="currentColor">
-                                                  <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" />
-                                                </svg>
-                                              </span>
-                                            )}
-                                          </div>
-                                          <p className="text-gray-500 text-sm">{tweet.user.username}</p>
-                                          <p className="mt-2">{tweet.text}</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                              </div>
-                            </TabsContent>
-                            
-                            <TabsContent value="neutral">
-                              <div className="space-y-4">
-                                {tweetResults?.tweets
-                                  .filter(t => t.sentiment === 'neutral')
-                                  .slice(0, 2)
-                                  .map(tweet => (
-                                    <div key={tweet.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                                      <div className="flex gap-3">
-                                        <div className="flex-shrink-0">
-                                          <img 
-                                            src={tweet.user.profileImage} 
-                                            alt={tweet.user.name} 
-                                            className="h-10 w-10 rounded-full"
-                                          />
-                                        </div>
-                                        <div>
-                                          <div className="flex items-center gap-1">
-                                            <p className="font-bold">{tweet.user.name}</p>
-                                            {tweet.user.verified && (
-                                              <span className="text-blue-500">
-                                                <svg className="h-4 w-4 inline" viewBox="0 0 24 24" fill="currentColor">
-                                                  <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" />
-                                                </svg>
-                                              </span>
-                                            )}
-                                          </div>
-                                          <p className="text-gray-500 text-sm">{tweet.user.username}</p>
-                                          <p className="mt-2">{tweet.text}</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                              </div>
-                            </TabsContent>
-                            
-                            <TabsContent value="negative">
-                              <div className="space-y-4">
-                                {tweetResults?.tweets
-                                  .filter(t => t.sentiment === 'negative')
-                                  .slice(0, 2)
-                                  .map(tweet => (
-                                    <div key={tweet.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                                      <div className="flex gap-3">
-                                        <div className="flex-shrink-0">
-                                          <img 
-                                            src={tweet.user.profileImage} 
-                                            alt={tweet.user.name} 
-                                            className="h-10 w-10 rounded-full"
-                                          />
-                                        </div>
-                                        <div>
-                                          <div className="flex items-center gap-1">
-                                            <p className="font-bold">{tweet.user.name}</p>
-                                            {tweet.user.verified && (
-                                              <span className="text-blue-500">
-                                                <svg className="h-4 w-4 inline" viewBox="0 0 24 24" fill="currentColor">
-                                                  <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" />
-                                                </svg>
-                                              </span>
-                                            )}
-                                          </div>
-                                          <p className="text-gray-500 text-sm">{tweet.user.username}</p>
-                                          <p className="mt-2">{tweet.text}</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                              </div>
-                            </TabsContent>
-                          </Tabs>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="influencers">
-                      <div className="dashboard-card">
-                        <h3 className="text-lg font-semibold mb-4">المؤثرين</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {overview.influencers.map((influencer, index) => (
-                            <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                              <div className="flex items-center gap-3">
-                                <img 
-                                  src={influencer.image || `https://randomuser.me/api/portraits/${index % 2 ? 'women' : 'men'}/${index + 1}.jpg`}
-                                  alt={influencer.name}
-                                  className="h-12 w-12 rounded-full object-cover border-2 border-saudi-green"
-                                />
-                                <div>
-                                  <p className="font-semibold">{influencer.name}</p>
-                                  <div className="flex items-center gap-3 text-sm text-gray-500">
-                                    <span>{influencer.followers} متابع</span>
-                                    <span>{influencer.engagement} تفاعل</span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {tweetResults?.tweets
-                                .filter(t => t.user.name === influencer.name)
-                                .slice(0, 1)
-                                .map(tweet => (
-                                  <div key={tweet.id} className="mt-3 pt-3 border-t">
-                                    <p className="text-sm line-clamp-2">{tweet.text}</p>
-                                    <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                                      <span>{tweet.likes.toLocaleString()} إعجاب</span>
-                                      <span>{tweet.retweets.toLocaleString()} إعادة تغريد</span>
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="hashtags">
-                      <div className="dashboard-card">
-                        <h3 className="text-lg font-semibold mb-4">الهاشتاقات الأكثر تداولاً</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                          {(overview.hashtags || trendingHashtags).map((tag, index) => (
-                            <Card key={index} className="text-center hover:shadow-md transition-shadow">
-                              <CardHeader className="pb-2">
-                                <CardTitle className="text-lg font-bold text-saudi-green">
-                                  {tag.tag}
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent className="pt-3">
-                                <p className="text-2xl font-bold">{tag.count.toLocaleString()}</p>
-                                <p className="text-sm text-gray-500">إشارة</p>
-                              </CardContent>
-                              <CardFooter className="pt-0 flex justify-center">
-                                <TrendBadge trend={tag.trend} />
-                              </CardFooter>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <h2 className="text-xl font-semibold text-gray-700 mb-2">لم يتم العثور على نتائج</h2>
-                  <p className="text-gray-500 mb-6">جرب استعلامًا آخر أو راجع صياغة البحث الخاص بك</p>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <h2 className="text-2xl font-semibold text-saudi-green mb-4">ابدأ البحث للحصول على تحليلات</h2>
-              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                استخدم شريط البحث للحصول على تحليلات متعمقة حول أي موضوع، حدث أو هاشتاق. 
-                يمكنك البحث عن أحداث رياضية، فعاليات عامة، أو مواضيع محددة.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto mb-12">
-                {exampleSearches.map((example, index) => (
-                  <Card 
-                    key={index} 
-                    className={`cursor-pointer transition-all hover:shadow-lg ${example.borderColor} border`}
-                    onClick={() => handleSearch(example.name)}
-                  >
-                    <CardHeader className={`${example.color} ${example.textColor} pb-2`}>
-                      <div className="flex items-center gap-2">
-                        {example.icon}
-                        <CardTitle>{example.name}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-3">
-                      <p className="text-gray-600 text-sm">{example.description}</p>
-                    </CardContent>
-                    <CardFooter className="pt-0 pb-3">
-                      <Badge variant="outline" className="bg-white flex gap-1 items-center">
-                        <Search className="h-3 w-3" />
-                        <span>بحث</span>
-                      </Badge>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-sm p-6 border max-w-3xl mx-auto">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Hash className="h-5 w-5 text-saudi-green" />
-                  <span>الهاشتاقات الأكثر بحثاً</span>
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {trendingHashtags.map((tag, index) => (
-                    <div 
-                      key={index}
-                      className="px-3 py-2 rounded-full border flex items-center gap-2 hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => handleSearch(tag.tag)}
-                    >
-                      <span className="font-medium">{tag.tag}</span>
-                      <Badge variant="outline" className="bg-gray-50 text-xs">
-                        {tag.count.toLocaleString()}
-                      </Badge>
-                      <TrendBadge trend={tag.trend} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-      
-      <div className="flex-grow"></div>
-      
-      <Footer />
-    </div>
-  );
-};
-
-export default Results;
+                                                  <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2
