@@ -15,7 +15,7 @@ import ActionButtons from '@/components/results/ActionButtons';
 import KeywordsTable from '@/components/results/KeywordsTable';
 import InfluencersList from '@/components/results/InfluencersList';
 import TweetFeed from '@/components/tweets/TweetFeed';
-import { Tweet } from '@/types/search';
+import { APIAnalysisResponse, AnalysisOverviewData, Tweet, TweetSearchResults, TrendType, ExampleSearch } from '@/types/search';
 import HighlightedTweet from '@/components/analysis/HighlightedTweet';
 import { get } from '@/api/apiClient';
 import API_ENDPOINTS from '@/api/apiUrls';
@@ -23,10 +23,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import TrendBadge from '@/components/results/TrendBadge';
-import { AnalysisOverviewData, TweetSearchResults, TrendType, ExampleSearch } from '@/types/search';
 import SearchProgressBar from '@/components/search/SearchProgress';
 import { SearchProgress, SearchStage } from '@/utils/searchStages';
 import { isSampleQuery, getSampleData, getSampleTweets } from '@/utils/sampleSearchData';
+import { transformAnalysisData } from '@/utils/analysisTransformers';
 
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
@@ -331,24 +331,30 @@ const Results = () => {
         }
       }
 
-      const endpoint = `${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(searchQuery)}`;
-      const response = await get<APIAnalysisResponse>(endpoint);
-      
-      if (response?.data) {
-        const transformedData = transformAnalysisData(response.data);
-        setOverview(transformedData);
-        setTweetResults({
-          total: response.data.detailed_analysis.length,
-          page: 1,
-          pages: 1,
-          tweets: transformedData.tweets || []
-        });
-      } else {
-        toast({
-          title: "خطأ في تحميل البيانات",
-          description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
-          variant: "destructive",
-        });
+      else {
+        const endpoint = `${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(searchQuery)}`;
+        const response = await get<APIAnalysisResponse>(endpoint);
+        
+        if (response) {
+          const transformedData = transformAnalysisData(response);
+          setOverview(transformedData);
+          setTweetResults({
+            total: response.detailed_analysis.length,
+            page: 1,
+            pages: 1,
+            tweets: transformedData.highlightTweets ? [
+              transformedData.highlightTweets.earliest,
+              transformedData.highlightTweets.mostLiked,
+              transformedData.highlightTweets.latest
+            ].filter(Boolean) as Tweet[] : []
+          });
+        } else {
+          toast({
+            title: "خطأ في تحميل البيانات",
+            description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching analysis data:", error);

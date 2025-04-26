@@ -1,51 +1,5 @@
 
-import { AnalysisOverviewData, KPIItem, Tweet } from '@/types/search';
-
-interface APIAnalysisResponse {
-  id: number;
-  search_query: number;
-  sentiment_counts: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
-  themes: string[];
-  expert_insights: {
-    industry_impact: string;
-    market_trends: string;
-    future_predictions: string;
-  };
-  detailed_analysis: Array<{
-    tweet_id: string;
-    original_text: string;
-    sentiment: string;
-    key_points: string[];
-    language: string;
-    engagement_metrics: {
-      likes: number;
-      retweets: number;
-      replies: number;
-      quotes: number;
-    };
-    metadata: {
-      username: string;
-      tweet_date: string;
-      tweet_url: string;
-      has_media: boolean;
-      media_count: number;
-      is_retweet: boolean;
-      is_reply: boolean;
-      language: string;
-    };
-  }>;
-  percentages: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
-  created_at: string;
-  status: string;
-}
+import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse } from '@/types/search';
 
 export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOverviewData => {
   // Calculate engagement stats

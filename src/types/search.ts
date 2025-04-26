@@ -29,6 +29,14 @@ export interface TweetSearchResults {
   tweets: Tweet[];
 }
 
+export interface KPIItem {
+  name: string;
+  value: string;
+  change?: number;
+  type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime';
+  lastUpdate?: string;
+}
+
 export interface AnalysisOverviewData {
   query: string;
   total: number;
@@ -37,15 +45,9 @@ export interface AnalysisOverviewData {
     neutral: number;
     negative: number;
   };
-  kpis: {
-    name: string;
-    value: string;
-    change?: number;
-    type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime';
-    lastUpdate?: string;
-  }[];
+  kpis: KPIItem[];
   timeline: any[];
-  locations: {
+  locations?: {
     name: string;
     value: number;
   }[];
@@ -83,3 +85,49 @@ export interface ExampleSearch {
 }
 
 export type TrendType = 'increase' | 'decrease' | 'neutral';
+
+export interface APIAnalysisResponse {
+  id: number;
+  search_query: number;
+  sentiment_counts: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+  themes: string[];
+  expert_insights: {
+    industry_impact: string;
+    market_trends: string;
+    future_predictions: string;
+  };
+  detailed_analysis: Array<{
+    tweet_id: string;
+    original_text: string;
+    sentiment: string;
+    key_points: string[];
+    language: string;
+    engagement_metrics: {
+      likes: number;
+      retweets: number;
+      replies: number;
+      quotes: number;
+    };
+    metadata: {
+      username: string;
+      tweet_date: string;
+      tweet_url: string;
+      has_media: boolean;
+      media_count: number;
+      is_retweet: boolean;
+      is_reply: boolean;
+      language: string;
+    };
+  }>;
+  percentages: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+  created_at: string;
+  status: string;
+}
