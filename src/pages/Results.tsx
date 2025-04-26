@@ -22,6 +22,10 @@ import API_ENDPOINTS from '@/api/apiUrls';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import TrendBadge from '@/components/results/TrendBadge';
+import { AnalysisOverviewData, TweetSearchResults, TrendType, ExampleSearch } from '@/types/search';
+import SearchProgressBar from '@/components/search/SearchProgress';
+import { SearchProgress, SearchStage } from '@/utils/searchStages';
 
 const sentimentData = [
   { date: "1 يناير", إيجابي: 4000, محايد: 2400, سلبي: 1200 },
@@ -81,7 +85,7 @@ const sampleTweets: Tweet[] = [
   },
   {
     id: "tweet-2",
-    text: "الأداء الدفاعي للسعودية كان رائعاً في الشوط الثان��. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
+    text: "الأداء الدفاعي للسعودية كان رائعاً ��ي الشوط الثان��. استطاعوا صد هجمات ��لأرجنتين المتكررة والحفاظ على التقدم. #كأس_العالم",
     user: {
       id: "user-2",
       name: "أحمد الشمري",
@@ -325,11 +329,11 @@ const exampleSearches = [
 ];
 
 const trendingHashtags = [
-  { tag: "#السعودية", count: 12500, trend: "increase" as const },
-  { tag: "#الرياض_موسم", count: 8300, trend: "increase" as const },
-  { tag: "#كأس_العالم", count: 7200, trend: "neutral" as const },
-  { tag: "#رؤية_2030", count: 5400, trend: "increase" as const },
-  { tag: "#العلا", count: 4100, trend: "increase" as const }
+  { tag: "#السعودية", count: 12500, trend: "increase" as TrendType },
+  { tag: "#الرياض_موسم", count: 8300, trend: "increase" as TrendType },
+  { tag: "#كأس_العالم", count: 7200, trend: "neutral" as TrendType },
+  { tag: "#رؤية_2030", count: 5400, trend: "increase" as TrendType },
+  { tag: "#العلا", count: 4100, trend: "increase" as TrendType }
 ];
 
 const Results = () => {
@@ -907,19 +911,7 @@ const Results = () => {
                                 <p className="text-sm text-gray-500">إشارة</p>
                               </CardContent>
                               <CardFooter className="pt-0 flex justify-center">
-                                <Badge className={
-                                  tag.trend === 'increase' 
-                                    ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                                    : tag.trend === 'decrease' 
-                                      ? 'bg-red-100 text-red-800 hover:bg-red-200' 
-                                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                }>
-                                  {tag.trend === 'increase' 
-                                    ? '↑ متزايد' 
-                                    : tag.trend === 'decrease' 
-                                      ? '↓ متناقص' 
-                                      : '− ثابت'}
-                                </Badge>
+                                <TrendBadge trend={tag.trend} />
                               </CardFooter>
                             </Card>
                           ))}
