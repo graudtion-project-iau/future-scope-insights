@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -15,7 +16,7 @@ import ActionButtons from '@/components/results/ActionButtons';
 import KeywordsTable from '@/components/results/KeywordsTable';
 import InfluencersList from '@/components/results/InfluencersList';
 import TweetFeed from '@/components/tweets/TweetFeed';
-import { Tweet } from '@/components/tweets/TweetCard';
+import { Tweet } from '@/types/search';
 import HighlightedTweet from '@/components/analysis/HighlightedTweet';
 import { get } from '@/api/apiClient';
 import API_ENDPOINTS from '@/api/apiUrls';

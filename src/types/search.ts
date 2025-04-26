@@ -17,7 +17,7 @@ export interface Tweet {
   replies: number;
   sentiment: 'positive' | 'neutral' | 'negative';
   media?: {
-    type: string;
+    type: 'image' | 'video';
     url: string;
   }[];
 }
