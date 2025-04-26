@@ -51,11 +51,11 @@ const locationData = [
 ];
 
 const keywordData = [
-  { keyword: "ضيافة", count: 240, trend: "increase" as const },
-  { keyword: "تراث", count: 185, trend: "increase" as const },
-  { keyword: "تحديث", count: 142, trend: "neutral" as const },
-  { keyword: "فعاليات", count: 118, trend: "increase" as const },
-  { keyword: "ترفيه", count: 96, trend: "decrease" as const },
+  { keyword: "ضيافة", count: 240, trend: "increase" as TrendType },
+  { keyword: "تراث", count: 185, trend: "increase" as TrendType },
+  { keyword: "تحديث", count: 142, trend: "neutral" as TrendType },
+  { keyword: "فعاليات", count: 118, trend: "increase" as TrendType },
+  { keyword: "ترفيه", count: 96, trend: "decrease" as TrendType },
 ];
 
 const influencerData = [
@@ -226,58 +226,7 @@ const khobzTweets: Tweet[] = [
   }
 ];
 
-interface AnalysisOverviewData {
-  query: string;
-  total: number;
-  sentiment: {
-    positive: number;
-    neutral: number;
-    negative: number;
-  };
-  kpis: {
-    name: string;
-    value: string;
-    change?: number;
-    type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime';
-    lastUpdate?: string;
-  }[];
-  timeline: any[];
-  locations: {
-    name: string;
-    value: number;
-  }[];
-  keywords: {
-    keyword: string;
-    count: number;
-    trend: 'increase' | 'decrease' | 'neutral';
-  }[];
-  influencers: {
-    name: string;
-    followers: string;
-    engagement: string;
-    image: string;
-  }[];
-  highlightTweets?: {
-    earliest?: Tweet;
-    mostLiked?: Tweet;
-    latest?: Tweet;
-  };
-  hashtags?: {
-    tag: string;
-    count: number;
-    trend: 'increase' | 'decrease' | 'neutral';
-  }[];
-  lastUpdate?: string;
-}
-
-interface TweetSearchResults {
-  total: number;
-  page: number;
-  pages: number;
-  tweets: Tweet[];
-}
-
-const exampleSearches = [
+const exampleSearches: ExampleSearch[] = [
   {
     name: "السعودية الأرجنتين",
     description: "مباراة كأس العالم التاريخية",
@@ -977,15 +926,7 @@ const Results = () => {
                       <Badge variant="outline" className="bg-gray-50 text-xs">
                         {tag.count.toLocaleString()}
                       </Badge>
-                      <span className={
-                        tag.trend === 'increase' 
-                          ? 'text-green-500' 
-                          : tag.trend === 'decrease' 
-                            ? 'text-red-500' 
-                            : 'text-gray-400'
-                      }>
-                        {tag.trend === 'increase' ? '↑' : tag.trend === 'decrease' ? '↓' : '−'}
-                      </span>
+                      <TrendBadge trend={tag.trend} />
                     </div>
                   ))}
                 </div>
