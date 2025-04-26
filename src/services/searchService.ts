@@ -1,11 +1,10 @@
-
 import { get, post } from "@/api/apiClient";
 import API_ENDPOINTS from "@/api/apiUrls";
 import { SearchProgress } from "@/utils/searchStages";
 import { AnalysisOverviewData, TweetSearchResults } from "@/types/search";
 
 /**
- * Function to execute a search in three stages:
+ * Function to execute a search in three phases:
  * 1. Initial search to get a search ID
  * 2. Analysis phase
  * 3. Dashboard preparation
@@ -22,24 +21,35 @@ export const executeSearch = async (
   tweetsData: TweetSearchResults | null;
 }> => {
   try {
-    // Initial search phase
+    // Phase 1: Initial search - create search query
     onProgress({
       stage: 'searching',
       progress: 10,
       message: 'بدء البحث وجمع التغريدات'
     });
     
-    // Call the initial search endpoint
-    const searchResponse = await post<{
-      success: boolean;
-      data: { searchId: string; estimatedTime: number }
-    }>(`${API_ENDPOINTS.search.query}`, { query });
+    // Call the create search query endpoint
+    const searchQueryParams = {
+      query: query,
+      search_type: "twitter",
+      parameters: {
+        maxItems: 100,
+        sort: "Top"
+      },
+      status: "pending"
+    };
     
-    if (!searchResponse?.data) {
+    const searchResponse = await post<{
+      id: string;
+      query: string;
+      status: string;
+    }>(`${API_ENDPOINTS.search.query}`, searchQueryParams);
+    
+    if (!searchResponse?.id) {
       throw new Error('فشل في بدء عملية البحث');
     }
     
-    const { searchId, estimatedTime } = searchResponse.data;
+    const searchId = searchResponse.id;
     
     onProgress({
       stage: 'searching',
@@ -48,67 +58,101 @@ export const executeSearch = async (
       searchId
     });
     
-    // Wait for initial results - simulate with timeout
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Start collection
+    await post(`${API_ENDPOINTS.search.status}/${searchId}/start_collection/`, {});
     
-    // Analysis phase
+    // Collect tweets
+    await post(`${API_ENDPOINTS.search.status}/${searchId}/collect_tweets/`, {});
+    
+    // Poll for search status until completed
+    let searchCompleted = false;
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    while (!searchCompleted && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const statusResponse = await get<{
+        status: string;
+        progress: number;
+      }>(`${API_ENDPOINTS.search.status}/${searchId}/`);
+      
+      if (statusResponse?.status === "completed") {
+        searchCompleted = true;
+      } else {
+        attempts++;
+        onProgress({
+          stage: 'searching',
+          progress: 25 + Math.min((attempts / maxAttempts) * 10, 10),
+          message: 'جاري جمع التغريدات...',
+          searchId
+        });
+      }
+    }
+    
+    // Phase 2: Analysis
     onProgress({
       stage: 'analyzing',
-      progress: 35,
+      progress: 40,
       message: 'بدء تحليل النتائج',
       searchId
     });
     
-    // Call the analysis endpoint
-    const analysisResponse = await get<{
-      success: boolean;
-      status: string;
-      progress: number;
-    }>(`${API_ENDPOINTS.analysis.trends}?searchId=${searchId}`);
+    // Start analysis
+    await post(`${API_ENDPOINTS.search.status}/${searchId}/analyze_tweets/`, {});
     
-    if (!analysisResponse) {
-      throw new Error('فشل في عملية التحليل');
+    // Poll for analysis status
+    let analysisCompleted = false;
+    attempts = 0;
+    
+    while (!analysisCompleted && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const analysisStatusResponse = await get<{
+        status: string;
+      }>(`${API_ENDPOINTS.search.status}/${searchId}/`);
+      
+      if (analysisStatusResponse?.status === "analysis_completed") {
+        analysisCompleted = true;
+      } else {
+        attempts++;
+        onProgress({
+          stage: 'analyzing',
+          progress: 40 + Math.min((attempts / maxAttempts) * 25, 25),
+          message: 'جاري تحليل المشاعر والمحتوى...',
+          searchId
+        });
+      }
     }
     
-    // Simulate analysis progress
-    for (let progress = 40; progress <= 65; progress += 5) {
-      await new Promise(resolve => setTimeout(resolve, 700));
-      onProgress({
-        stage: 'analyzing',
-        progress,
-        message: 'جاري تحليل المحتوى والمشاعر',
-        searchId
-      });
-    }
-    
-    // Preparation phase
+    // Phase 3: Report preparation
     onProgress({
       stage: 'preparing',
       progress: 70,
-      message: 'بدء إعداد لوحة المعلومات',
+      message: 'إعداد التقرير النهائي',
       searchId
     });
     
-    // Call the dashboard preparation endpoint
-    const dashboardResponse = await get<{
-      success: boolean;
-      status: string;
-    }>(`${API_ENDPOINTS.analysis.overview}?searchId=${searchId}`);
-    
-    // Simulate preparation progress
+    // Simulate preparation time
     for (let progress = 75; progress <= 90; progress += 5) {
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise(resolve => setTimeout(resolve, 500));
       onProgress({
         stage: 'preparing',
         progress,
-        message: 'جاري إعداد البيانات والمخططات',
+        message: 'جاري إعداد البيانات والرسوم البيانية',
         searchId
       });
     }
     
-    // Get final results
-    const analysisData = await get<{ data: AnalysisOverviewData }>(`${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(query)}`);
-    const tweetsData = await get<{ data: TweetSearchResults }>(`${API_ENDPOINTS.analysis.tweets}?query=${encodeURIComponent(query)}`);
+    // Get final results - tweets
+    const tweetsResponse = await get<{ results: any[] }>(`${API_ENDPOINTS.analysis.tweets}?search_query=${searchId}`);
+    
+    // Get final results - analysis
+    const analysisResponse = await get<{ results: any[] }>(`${API_ENDPOINTS.analysis.overview}?search_query=${searchId}`);
+    
+    // Transform API response to our app's data format
+    const tweetsData = transformTweetsResponse(tweetsResponse?.results || []);
+    const analysisData = transformAnalysisResponse(analysisResponse?.results?.[0] || {}, query);
     
     // Complete
     onProgress({
@@ -120,10 +164,12 @@ export const executeSearch = async (
     
     return {
       searchId,
-      analysisData: analysisData?.data || null,
-      tweetsData: tweetsData?.data || null
+      analysisData,
+      tweetsData
     };
   } catch (error) {
+    console.error('Search error:', error);
+    
     onProgress({
       stage: 'error',
       progress: 0,
@@ -133,6 +179,115 @@ export const executeSearch = async (
     
     throw error;
   }
+};
+
+/**
+ * Transform tweets API response to our app's format
+ */
+const transformTweetsResponse = (tweets: any[]): TweetSearchResults => {
+  return {
+    total: tweets.length,
+    page: 1,
+    pages: Math.ceil(tweets.length / 20),
+    tweets: tweets.map(tweet => ({
+      id: tweet.tweet_id || tweet.id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
+      text: tweet.text || '',
+      user: {
+        id: tweet.user_id || `user-${Math.random().toString(36).substring(2, 9)}`,
+        name: tweet.user_name || tweet.username || 'Anonymous',
+        username: tweet.username || 'user',
+        profileImage: tweet.profile_image || "https://randomuser.me/api/portraits/men/1.jpg",
+        verified: tweet.verified || false,
+        followers: tweet.followers || 0
+      },
+      date: tweet.date || new Date().toISOString(),
+      likes: tweet.likes || 0,
+      retweets: tweet.retweets || 0,
+      quotes: tweet.quotes || 0,
+      replies: tweet.replies || 0,
+      sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
+      media: tweet.media ? tweet.media.map((m: any) => ({
+        type: (m.type || 'image') as 'image' | 'video',
+        url: m.url || ''
+      })) : undefined
+    }))
+  };
+};
+
+/**
+ * Transform analysis API response to our app's format
+ */
+const transformAnalysisResponse = (analysis: any, query: string): AnalysisOverviewData => {
+  const sentimentDistribution = analysis.sentiment_distribution || {
+    positive: 0,
+    neutral: 0,
+    negative: 0
+  };
+  
+  const total = analysis.total_tweets || 0;
+  
+  // Calculate percentages for sentiment
+  const positive = Math.round((sentimentDistribution.positive / (total || 1)) * 100);
+  const neutral = Math.round((sentimentDistribution.neutral / (total || 1)) * 100);
+  const negative = Math.round((sentimentDistribution.negative / (total || 1)) * 100);
+  
+  // Transform top themes to keywords
+  const keywords = Object.entries(analysis.top_themes || {}).map(([keyword, count]: [string, any]) => ({
+    keyword,
+    count: count as number,
+    trend: (analysis.trends && analysis.trends[keyword]) || 'neutral' as 'increase' | 'decrease' | 'neutral'
+  }));
+  
+  // Transform hashtags
+  const hashtags = Object.entries(analysis.top_hashtags || {}).map(([tag, count]: [string, any]) => ({
+    tag,
+    count: count as number,
+    trend: (analysis.trends && analysis.trends[tag]) || 'neutral' as 'increase' | 'decrease' | 'neutral'
+  }));
+  
+  // Transform influencers
+  const influencers = (analysis.top_influencers || []).map((influencer: any) => ({
+    name: influencer.username || 'Anonymous',
+    followers: influencer.followers?.toLocaleString() || '0',
+    engagement: influencer.engagement?.toFixed(1) + '%' || '0%',
+    image: influencer.profile_image || "https://randomuser.me/api/portraits/men/1.jpg"
+  }));
+  
+  // Transform time distribution to timeline data
+  const timeline = Object.entries(analysis.time_distribution || {}).map(([date, data]: [string, any]) => ({
+    date,
+    إيجابي: data.positive || 0,
+    محايد: data.neutral || 0,
+    سلبي: data.negative || 0
+  }));
+  
+  // Transform locations
+  const locations = Object.entries(analysis.location_distribution || {}).map(([name, value]: [string, any]) => ({
+    name,
+    value: (value as number)
+  }));
+  
+  return {
+    query,
+    total,
+    sentiment: {
+      positive,
+      neutral,
+      negative
+    },
+    kpis: [
+      { name: "متوسط المشاعر", value: `+${(analysis.avg_sentiment || 0).toFixed(2)}`, change: analysis.sentiment_change || 0, type: "sentiment" },
+      { name: "عدد الإشارات", value: total.toLocaleString(), change: analysis.mentions_change || 0, type: "mentions" },
+      { name: "الموقع الرئيسي", value: locations[0]?.name || "غير متاح", type: "location" },
+      { name: "عدد المؤثرين", value: influencers.length.toString(), change: analysis.influencers_change || 0, type: "influencers" }
+    ],
+    timeline,
+    locations,
+    keywords,
+    influencers,
+    hashtags,
+    lastUpdate: new Date().toLocaleString('ar-SA')
+  };
 };
 
 /**
@@ -333,7 +488,7 @@ export const executeRiyadhSeasonSearch = async (
       },
       {
         id: "riyadh-4",
-        text: "مواقف السيارات غير كافية في منطقة الفعاليات. قضيت أكثر من ساعة للحصول على موقف. نأمل معالجة هذه المشكلة في المواسم القادمة.",
+        text: "مواقف السيارات غير ك��فية في منطقة الفعاليات. قضيت أكثر من ساعة للحصول على موقف. نأمل معالجة هذه المشكلة في المواسم القادمة.",
         user: {
           id: "user-204",
           name: "فهد العتيبي",
