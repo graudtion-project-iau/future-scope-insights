@@ -1,3 +1,4 @@
+
 import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse } from '@/types/search';
 
 // Define interfaces for API response types
@@ -39,7 +40,7 @@ interface TweetMetadata {
     bookmark_count: number;
   };
   media?: {
-    media_details: Array<{
+    media_details?: Array<{
       media_url_https: string;
       type: 'photo' | 'video';
       sizes?: {
@@ -104,9 +105,10 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     // Transform tweets with rich metadata
     const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => {
       const metadata = tweet.metadata;
-      const userInfo = metadata.user || {};
+      // Use type assertion to ensure TypeScript recognizes userInfo properties
+      const userInfo = (metadata.user || {}) as NonNullable<typeof metadata.user>;
       
-      // Transform media items
+      // Transform media items safely with optional chaining
       const mediaItems = metadata.media?.media_details?.map(media => ({
         type: media.type === 'photo' ? 'image' : 'video',
         url: media.media_url_https,
@@ -131,13 +133,13 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
         },
         date: metadata.tweet_date,
         url: metadata.tweet_url,
-        source: metadata.tweet?.source,
+        source: metadata.tweet?.source || '',
         likes: tweet.engagement_metrics?.likes || 0,
         retweets: tweet.engagement_metrics?.retweets || 0,
         quotes: tweet.engagement_metrics?.quotes || 0,
         replies: tweet.engagement_metrics?.replies || 0,
-        viewCount: metadata.tweet?.view_count,
-        bookmarkCount: metadata.tweet?.bookmark_count,
+        viewCount: metadata.tweet?.view_count || 0,
+        bookmarkCount: metadata.tweet?.bookmark_count || 0,
         sentiment: tweet.sentiment as 'positive' | 'neutral' | 'negative',
         media: mediaItems,
         keyPoints: tweet.key_points,
@@ -208,9 +210,9 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
           image: tweet.user.profileImage
         })),
       highlightTweets: {
-        earliest: sortedTweets[0],
-        mostLiked: [...transformedTweets].sort((a, b) => b.likes - a.likes)[0],
-        latest: sortedTweets[sortedTweets.length - 1]
+        earliest: sortedTweets.length > 0 ? sortedTweets[0] : undefined,
+        mostLiked: transformedTweets.length > 0 ? [...transformedTweets].sort((a, b) => b.likes - a.likes)[0] : undefined,
+        latest: sortedTweets.length > 0 ? sortedTweets[sortedTweets.length - 1] : undefined
       },
       themes: apiData.themes || [],
       expertInsights: apiData.expert_insights,
