@@ -34,6 +34,7 @@ export interface KPIItem {
   change?: number;
   type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime' | 'engagement';
   lastUpdate?: string;
+  color?: string;
 }
 
 export interface AnalysisOverviewData {

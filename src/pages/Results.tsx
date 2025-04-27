@@ -20,6 +20,7 @@ import ExampleSearches from '@/components/results/ExampleSearches';
 import SentimentAnalysis from '@/components/results/SentimentAnalysis';
 import AnalysisOverview from '@/components/results/AnalysisOverview';
 import HashtagsDisplay from '@/components/results/HashtagsDisplay';
+import InfluencersList from '@/components/results/InfluencersList';
 import { isSampleQuery, getSampleData, getSampleTweets } from '@/utils/sampleSearchData';
 import { transformAnalysisData } from '@/utils/analysisTransformers';
 
@@ -79,6 +80,96 @@ const exampleSearches: ExampleSearch[] = [
     color: "bg-cyan-100",
     textColor: "text-cyan-800",
     borderColor: "border-cyan-200"
+  }
+];
+
+const worldCupSampleTweets: Tweet[] = [
+  {
+    id: "wc1",
+    text: "مباراة تاريخية! السعودية تهزم الأرجنتين! 🎉🎉🎉 #السعودية_الأرجنتين",
+    user: {
+      id: "u1",
+      name: "فهد العنزي",
+      username: "@fahad_sport",
+      profileImage: "https://randomuser.me/api/portraits/men/11.jpg",
+      verified: true,
+      followers: 120000
+    },
+    date: "2022-11-22T14:23:00Z",
+    likes: 45000,
+    retweets: 15000,
+    quotes: 2000,
+    replies: 3000,
+    sentiment: "positive",
+    media: [
+      {
+        type: "image",
+        url: "https://picsum.photos/800/500"
+      }
+    ]
+  },
+  {
+    id: "wc2",
+    text: "تاريخ جديد يكتب اليوم! المنتخب السعودي يقدم مباراة استثنائية #كأس_العالم",
+    user: {
+      id: "u2",
+      name: "سارة الشهري",
+      username: "@sara_sports",
+      profileImage: "https://randomuser.me/api/portraits/women/12.jpg",
+      verified: false,
+      followers: 50000
+    },
+    date: "2022-11-22T14:30:00Z",
+    likes: 32000,
+    retweets: 8500,
+    quotes: 1200,
+    replies: 2100,
+    sentiment: "positive"
+  }
+];
+
+const khobzSampleTweets: Tweet[] = [
+  {
+    id: "k1",
+    text: "عاجل: انفجار في الخبر، والسلطات تؤكد أنه حادث عرضي وتدعو للهدوء",
+    user: {
+      id: "u3",
+      name: "أخبار السعودية",
+      username: "@ksa_news",
+      profileImage: "https://randomuser.me/api/portraits/men/21.jpg",
+      verified: true,
+      followers: 250000
+    },
+    date: new Date().toISOString(),
+    likes: 1200,
+    retweets: 3000,
+    quotes: 420,
+    replies: 750,
+    sentiment: "neutral",
+    media: [
+      {
+        type: "image",
+        url: "https://picsum.photos/800/450"
+      }
+    ]
+  },
+  {
+    id: "k2",
+    text: "الدفاع المدني يسيطر على الحادث في الخبر، ولا إصابات بشرية #انفجار_الخبر",
+    user: {
+      id: "u4",
+      name: "محمد الدوسري",
+      username: "@m_dosari",
+      profileImage: "https://randomuser.me/api/portraits/men/22.jpg",
+      verified: false,
+      followers: 35000
+    },
+    date: new Date().toISOString(),
+    likes: 850,
+    retweets: 1200,
+    quotes: 210,
+    replies: 320,
+    sentiment: "positive"
   }
 ];
 
@@ -171,17 +262,17 @@ const Results = () => {
       
       if (isWorldCupMatch) {
         setTweetResults({
-          total: sampleTweets.length,
+          total: worldCupSampleTweets.length,
           page: 1,
           pages: 1,
-          tweets: sampleTweets
+          tweets: worldCupSampleTweets
         });
       } else if (isKhobzEvent) {
         setTweetResults({
-          total: khobzTweets.length,
+          total: khobzSampleTweets.length,
           page: 1,
           pages: 1,
-          tweets: khobzTweets
+          tweets: khobzSampleTweets
         });
       } else {
         const filterParams = [
