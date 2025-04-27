@@ -36,7 +36,7 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     {
       name: "متوسط التفاعل",
       value: avgEngagement.toFixed(0),
-      type: "engagement",
+      type: "engagement", // Now this is a valid type since we added it to the KPIItem interface
       change: avgEngagement > 100 ? 1 : -1,
     },
     {

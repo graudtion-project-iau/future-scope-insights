@@ -1,4 +1,3 @@
-
 export interface Tweet {
   id: string;
   text: string;
@@ -33,7 +32,7 @@ export interface KPIItem {
   name: string;
   value: string;
   change?: number;
-  type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime';
+  type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime' | 'engagement';
   lastUpdate?: string;
 }
 
