@@ -1,3 +1,4 @@
+
 import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse } from '@/types/search';
 
 // Define interfaces for API response types
@@ -187,7 +188,7 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
       ],
       timeline: [
         { date: "اليوم 1", إيجابي: sentimentCounts.positive * 0.3, محايد: sentimentCounts.neutral * 0.3, سلبي: sentimentCounts.negative * 0.3 },
-        { date: "اليوم 2", إي��ابي: sentimentCounts.positive * 0.4, محايد: sentimentCounts.neutral * 0.4, سلبي: sentimentCounts.negative * 0.4 },
+        { date: "اليوم 2", إيجابي: sentimentCounts.positive * 0.4, محايد: sentimentCounts.neutral * 0.4, سلبي: sentimentCounts.negative * 0.4 },
         { date: "اليوم 3", إيجابي: sentimentCounts.positive * 0.6, محايد: sentimentCounts.neutral * 0.6, سلبي: sentimentCounts.negative * 0.6 },
         { date: "اليوم 4", إيجابي: sentimentCounts.positive * 0.8, محايد: sentimentCounts.neutral * 0.8, سلبي: sentimentCounts.negative * 0.8 },
         { date: "اليوم 5", إيجابي: sentimentCounts.positive, محايد: sentimentCounts.neutral, سلبي: sentimentCounts.negative }
