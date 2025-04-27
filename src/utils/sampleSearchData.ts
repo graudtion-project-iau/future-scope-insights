@@ -1,4 +1,3 @@
-
 import { AnalysisOverviewData, Tweet } from '@/types/search';
 
 // Sample tweets for tourism-related queries
@@ -102,8 +101,20 @@ const sampleData: Record<string, AnalysisOverviewData> = {
     hashtags: [
       { tag: "#السياحة_السعودية", count: 5400, trend: "increase" },
       { tag: "#اكتشف_السعودية", count: 3200, trend: "increase" },
-      { tag: "#وجهات_سياحية", count: 2800, trend: "neutral" }
-    ]
+      { tag: "#وجهات_سيا��ية", count: 2800, trend: "neutral" }
+    ],
+    themes: [
+      "السياحة الداخلية",
+      "المواقع التراثية",
+      "الفعاليات الترفيهية",
+      "التنمية السياحية",
+      "الخدمات الفندقية"
+    ],
+    expertInsights: {
+      industry_impact: "تزايد الاستثمارات في القطاع السياحي يؤدي إلى تحسين جودة الخدمات وزيادة فرص العمل",
+      market_trends: "ارتفاع الطلب على التجارب السياحية الفريدة والأصيلة في المملكة",
+      future_predictions: "توقعات بنمو مستدام في القطاع السياحي مع استمرار تطوير البنية التحتية والمرافق"
+    }
   },
   "ملاحظات عن تجربة العلا": {
     query: "ملاحظات عن تجربة العلا",
@@ -142,7 +153,19 @@ const sampleData: Record<string, AnalysisOverviewData> = {
       { tag: "#العلا", count: 4200, trend: "increase" },
       { tag: "#اكتشف_العلا", count: 2800, trend: "increase" },
       { tag: "#تراث_العلا", count: 2100, trend: "neutral" }
-    ]
+    ],
+    themes: [
+      "التراث العالمي",
+      "السياحة الثقافية",
+      "المواقع الأثرية",
+      "الفنون والثقافة",
+      "التجارب المحلية"
+    ],
+    expertInsights: {
+      industry_impact: "تحول العلا إلى وجهة سياحية عالمية يعزز مكانة المملكة في السياحة الثقافية",
+      market_trends: "زيادة الاهتمام بالسياحة المستدامة والتجارب الثقافية الأصيلة",
+      future_predictions: "توقعات بتضاعف أعداد الزوار مع اكتمال مشاريع التطوير والبنية التحتية"
+    }
   },
   "تأثير موسم الرياض": {
     query: "تأثير موسم الرياض",
@@ -181,7 +204,19 @@ const sampleData: Record<string, AnalysisOverviewData> = {
       { tag: "#موسم_الرياض", count: 8500, trend: "increase" },
       { tag: "#روح_الرياض", count: 5200, trend: "increase" },
       { tag: "#فعاليات_الرياض", count: 4100, trend: "neutral" }
-    ]
+    ],
+    themes: [
+      "الترفيه والفعاليات",
+      "السياحة الموسمية",
+      "الأنشطة العائلية",
+      "المهرجانات",
+      "التسوق والتجزئة"
+    ],
+    expertInsights: {
+      industry_impact: "نجاح موسم الرياض في تنشيط الحركة الاقتصادية وخلق فرص عمل موسمية",
+      market_trends: "تزايد الإقبال على الفعاليات الترفيهية والثقافية المتنوعة",
+      future_predictions: "توقعات بتوسع نطاق الفعاليات وزيادة مشاركة العلامات التجارية العالمية"
+    }
   }
 };
 

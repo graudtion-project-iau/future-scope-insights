@@ -37,6 +37,12 @@ export interface KPIItem {
   color?: string;
 }
 
+export interface ExpertInsights {
+  industry_impact: string;
+  market_trends: string;
+  future_predictions: string;
+}
+
 export interface AnalysisOverviewData {
   query: string;
   total: number;
@@ -72,6 +78,8 @@ export interface AnalysisOverviewData {
     count: number;
     trend: 'increase' | 'decrease' | 'neutral';
   }[];
+  themes?: string[];
+  expertInsights?: ExpertInsights;
   lastUpdate?: string;
 }
 

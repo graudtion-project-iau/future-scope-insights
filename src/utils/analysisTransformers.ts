@@ -1,5 +1,4 @@
-
-import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse } from '@/types/search';
+import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse, ExpertInsights } from '@/types/search';
 
 export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOverviewData => {
   // Calculate engagement stats
@@ -117,6 +116,12 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
       ),
       latest: transformedTweets[transformedTweets.length - 1]
     },
+    themes: apiData.themes || [],
+    expertInsights: apiData.expert_insights ? {
+      industry_impact: apiData.expert_insights.industry_impact,
+      market_trends: apiData.expert_insights.market_trends,
+      future_predictions: apiData.expert_insights.future_predictions
+    } : undefined,
     lastUpdate: new Date(apiData.created_at).toLocaleString('ar-SA')
   };
 };
