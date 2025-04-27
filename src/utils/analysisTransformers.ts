@@ -177,13 +177,19 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
           return bEngagement - aEngagement;
         })
         .slice(0, 5)
-        .map(tweet => ({
-          name: tweet.metadata?.username || "مستخدم تويتر",
-          followers: Math.floor(Math.random() * 10000).toString(),
-          engagement: (((tweet.engagement_metrics as EngagementMetrics)?.likes || 0) + 
-                      ((tweet.engagement_metrics as EngagementMetrics)?.retweets || 0)) / 100).toFixed(1) + '%',
-          image: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`
-        })),
+        .map(tweet => {
+          // Fixed the parentheses issue in the calculation
+          const likes = (tweet.engagement_metrics as EngagementMetrics)?.likes || 0;
+          const retweets = (tweet.engagement_metrics as EngagementMetrics)?.retweets || 0;
+          const engagementValue = ((likes + retweets) / 100).toFixed(1) + '%';
+          
+          return {
+            name: tweet.metadata?.username || "مستخدم تويتر",
+            followers: Math.floor(Math.random() * 10000).toString(),
+            engagement: engagementValue,
+            image: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`
+          };
+        }),
       highlightTweets: {
         earliest: earliestTweet,
         mostLiked: mostLikedTweet,
