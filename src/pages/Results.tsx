@@ -34,6 +34,30 @@ const trendingHashtags = [
 
 const exampleSearches: ExampleSearch[] = [
   {
+    name: "آراء السياحة في السعودية",
+    description: "تحليل تجربة السياح في المملكة",
+    icon: <MapPin className="h-5 w-5" />,
+    color: "bg-green-100",
+    textColor: "text-green-800",
+    borderColor: "border-green-200"
+  },
+  {
+    name: "ملاحظات عن تجربة العلا",
+    description: "آراء الزوار وتقييم السياحة",
+    icon: <Activity className="h-5 w-5" />,
+    color: "bg-purple-100",
+    textColor: "text-purple-800",
+    borderColor: "border-purple-200"
+  },
+  {
+    name: "تأثير موسم الرياض",
+    description: "تحليل التأثير الاقتصادي والثقافي",
+    icon: <Sparkles className="h-5 w-5" />,
+    color: "bg-blue-100",
+    textColor: "text-blue-800",
+    borderColor: "border-blue-200"
+  },
+  {
     name: "السعودية الأرجنتين",
     description: "مباراة كأس العالم التاريخية",
     icon: <Activity className="h-5 w-5" />,
@@ -50,128 +74,17 @@ const exampleSearches: ExampleSearch[] = [
     borderColor: "border-red-200"
   },
   {
-    name: "موسم الرياض",
-    description: "تحليل المهرجان السنوي",
-    icon: <Sparkles className="h-5 w-5" />,
-    color: "bg-blue-100",
-    textColor: "text-blue-800",
-    borderColor: "border-blue-200"
-  },
-  {
     name: "رالي داكار",
     description: "تحليل المسابقة الرياضية",
     icon: <BarChart2 className="h-5 w-5" />,
     color: "bg-amber-100",
     textColor: "text-amber-800",
     borderColor: "border-amber-200"
-  },
-  {
-    name: "السياحة في العلا",
-    description: "آراء الزوار والمعالم",
-    icon: <MapPin className="h-5 w-5" />,
-    color: "bg-purple-100",
-    textColor: "text-purple-800",
-    borderColor: "border-purple-200"
-  },
-  {
-    name: "معرض الرياض للكتاب",
-    description: "تغطية وتفاعلات الحدث",
-    icon: <Users className="h-5 w-5" />,
-    color: "bg-cyan-100",
-    textColor: "text-cyan-800",
-    borderColor: "border-cyan-200"
   }
 ];
 
-const worldCupSampleTweets: Tweet[] = [
-  {
-    id: "wc1",
-    text: "مباراة تاريخية! السعودية تهزم الأرجنتين! 🎉🎉🎉 #السعودية_الأرجنتين",
-    user: {
-      id: "u1",
-      name: "فهد العنزي",
-      username: "@fahad_sport",
-      profileImage: "https://randomuser.me/api/portraits/men/11.jpg",
-      verified: true,
-      followers: 120000
-    },
-    date: "2022-11-22T14:23:00Z",
-    likes: 45000,
-    retweets: 15000,
-    quotes: 2000,
-    replies: 3000,
-    sentiment: "positive",
-    media: [
-      {
-        type: "image",
-        url: "https://picsum.photos/800/500"
-      }
-    ]
-  },
-  {
-    id: "wc2",
-    text: "تاريخ جديد يكتب اليوم! المنتخب السعودي يقدم مباراة استثنائية #كأس_العالم",
-    user: {
-      id: "u2",
-      name: "سارة الشهري",
-      username: "@sara_sports",
-      profileImage: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: false,
-      followers: 50000
-    },
-    date: "2022-11-22T14:30:00Z",
-    likes: 32000,
-    retweets: 8500,
-    quotes: 1200,
-    replies: 2100,
-    sentiment: "positive"
-  }
-];
-
-const khobzSampleTweets: Tweet[] = [
-  {
-    id: "k1",
-    text: "عاجل: انفجار في الخبر، والسلطات تؤكد أنه حادث عرضي وتدعو للهدوء",
-    user: {
-      id: "u3",
-      name: "أخبار السعودية",
-      username: "@ksa_news",
-      profileImage: "https://randomuser.me/api/portraits/men/21.jpg",
-      verified: true,
-      followers: 250000
-    },
-    date: new Date().toISOString(),
-    likes: 1200,
-    retweets: 3000,
-    quotes: 420,
-    replies: 750,
-    sentiment: "neutral",
-    media: [
-      {
-        type: "image",
-        url: "https://picsum.photos/800/450"
-      }
-    ]
-  },
-  {
-    id: "k2",
-    text: "الدفاع المدني يسيطر على الحادث في الخبر، ولا إصابات بشرية #انفجار_الخبر",
-    user: {
-      id: "u4",
-      name: "محمد الدوسري",
-      username: "@m_dosari",
-      profileImage: "https://randomuser.me/api/portraits/men/22.jpg",
-      verified: false,
-      followers: 35000
-    },
-    date: new Date().toISOString(),
-    likes: 850,
-    retweets: 1200,
-    quotes: 210,
-    replies: 320,
-    sentiment: "positive"
-  }
-];
+const worldCupSampleTweets = getSampleTweets("السعودية الأرجنتين");
+const khobzSampleTweets = getSampleTweets("انفجار الخبر");
 
 const Results = () => {
   const location = useLocation();
@@ -218,15 +131,47 @@ const Results = () => {
         }
       }
 
-      else {
-        const endpoint = `${API_ENDPOINTS.analysis.overview}?query=${encodeURIComponent(searchQuery)}`;
-        const response = await get<APIAnalysisResponse>(endpoint);
+      // Use report ID 1 as default for testing
+      const endpoint = `${API_ENDPOINTS.analysis.overview}1/`;
+      console.log("Fetching analysis data from:", endpoint);
+      const response = await get<APIAnalysisResponse>(endpoint);
+      
+      if (response) {
+        console.log("Analysis data received:", response);
+        const transformedData = transformAnalysisData(response);
+        setOverview(transformedData);
         
-        if (response) {
-          const transformedData = transformAnalysisData(response);
-          setOverview(transformedData);
+        // If we have detailed_analysis, use it for tweets
+        if (response.detailed_analysis && response.detailed_analysis.length > 0) {
+          const tweets = response.detailed_analysis.map(tweet => ({
+            id: tweet.tweet_id,
+            text: tweet.original_text || '',
+            user: {
+              id: tweet.tweet_id,
+              name: tweet.metadata?.username || "مستخدم تويتر",
+              username: tweet.metadata?.username || "@user",
+              profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+              verified: false,
+              followers: Math.floor(Math.random() * 10000)
+            },
+            date: tweet.metadata?.tweet_date || new Date().toISOString(),
+            likes: tweet.engagement_metrics?.likes || 0,
+            retweets: tweet.engagement_metrics?.retweets || 0,
+            quotes: tweet.engagement_metrics?.quotes || 0,
+            replies: tweet.engagement_metrics?.replies || 0,
+            sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
+          }));
+          
           setTweetResults({
-            total: response.detailed_analysis.length,
+            total: tweets.length,
+            page: 1,
+            pages: 1,
+            tweets
+          });
+        } else if (transformedData.highlightTweets) {
+          // Fall back to highlight tweets if detailed analysis is missing
+          setTweetResults({
+            total: transformedData.highlightTweets ? Object.keys(transformedData.highlightTweets).length : 0,
             page: 1,
             pages: 1,
             tweets: transformedData.highlightTweets ? [
@@ -235,13 +180,13 @@ const Results = () => {
               transformedData.highlightTweets.latest
             ].filter(Boolean) as Tweet[] : []
           });
-        } else {
-          toast({
-            title: "خطأ في تحميل البيانات",
-            description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
-            variant: "destructive",
-          });
         }
+      } else {
+        toast({
+          title: "خطأ في تحميل البيانات",
+          description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching analysis data:", error);
@@ -262,34 +207,65 @@ const Results = () => {
       
       if (isWorldCupMatch) {
         setTweetResults({
-          total: worldCupSampleTweets.length,
+          total: worldCupSampleTweets.tweets.length,
           page: 1,
           pages: 1,
-          tweets: worldCupSampleTweets
+          tweets: worldCupSampleTweets.tweets
         });
       } else if (isKhobzEvent) {
         setTweetResults({
-          total: khobzSampleTweets.length,
+          total: khobzSampleTweets.tweets.length,
           page: 1,
           pages: 1,
-          tweets: khobzSampleTweets
+          tweets: khobzSampleTweets.tweets
         });
       } else {
         const filterParams = [
-          `query=${encodeURIComponent(searchQuery)}`,
+          `search_query=1`, // Use fixed search query ID 1 for testing
           `page=${page}`,
-          `sort=${currentFilters.sortBy}`,
-          `timeRange=${currentFilters.timeRange}`,
-          currentFilters.hasMedia ? 'hasMedia=true' : '',
-          currentFilters.verifiedOnly ? 'verifiedOnly=true' : '',
-          `sentiment=${currentFilters.sentiment.join(',')}`
         ].filter(Boolean).join('&');
         
         const endpoint = `${API_ENDPOINTS.analysis.tweets}?${filterParams}`;
-        const data = await get<{ data: TweetSearchResults }>(endpoint);
+        console.log("Fetching tweets from:", endpoint);
         
-        if (data?.data) {
-          setTweetResults(data.data);
+        const response = await get<any>(endpoint);
+        
+        if (response) {
+          console.log("Tweets data received:", response);
+          
+          // Handle both formats: array of tweets or object with results array
+          let tweets: any[] = [];
+          if (Array.isArray(response)) {
+            tweets = response;
+          } else if (response.results && Array.isArray(response.results)) {
+            tweets = response.results;
+          }
+          
+          const transformedTweets = tweets.map(tweet => ({
+            id: tweet.tweet_id || tweet.id,
+            text: tweet.original_text || tweet.text || '',
+            user: {
+              id: tweet.user_id || `user-${Math.random().toString(36).substring(2, 9)}`,
+              name: tweet.username || "مستخدم تويتر",
+              username: tweet.username || "@user",
+              profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+              verified: false,
+              followers: Math.floor(Math.random() * 10000)
+            },
+            date: tweet.tweet_date || tweet.date || new Date().toISOString(),
+            likes: tweet.likes || 0,
+            retweets: tweet.retweets || 0,
+            quotes: tweet.quotes || 0,
+            replies: tweet.replies || 0,
+            sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
+          }));
+          
+          setTweetResults({
+            total: transformedTweets.length,
+            page,
+            pages: Math.ceil(transformedTweets.length / 20),
+            tweets: transformedTweets
+          });
         } else {
           toast({
             title: "خطأ في تحميل التغريدات",

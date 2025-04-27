@@ -12,20 +12,20 @@ const API_ENDPOINTS = {
   
   // Search related endpoints
   search: {
-    query: '/api/search-queries',
+    query: '/api/searchqueries/',
     suggestions: '/api/search-suggestions/',
     trending: '/api/trending-topics/',
     filter: '/api/search-filter/',
-    status: '/api/search-queries', // Updated to match new API
-    cancel: '/api/search-queries/cancel/',
+    status: '/api/searchqueries/', // Updated to match new API
+    cancel: '/api/searchqueries/cancel/',
   },
   
   // Analysis related endpoints
   analysis: {
-    overview: '/api/analysis',
+    overview: '/api/analysis/',
     sentiment: '/api/analysis/sentiment/',
     trends: '/api/analysis/trends/',
-    tweets: '/api/tweets',
+    tweets: '/api/tweets/',
     influencers: '/api/analysis/influencers/',
     timeline: '/api/analysis/timeline/',
     location: '/api/analysis/location/',
