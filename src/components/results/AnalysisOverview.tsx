@@ -1,11 +1,13 @@
 
 import React from 'react';
-import { AnalysisOverviewData, KPIItem, Tweet } from '@/types/search';
+import { AnalysisOverviewData } from '@/types/search';
 import LineChart from '@/components/charts/LineChart';
 import PieChart from '@/components/charts/PieChart';
 import HighlightedTweet from '@/components/analysis/HighlightedTweet';
 import KeywordsTable from '@/components/results/KeywordsTable';
 import InfluencersList from '@/components/results/InfluencersList';
+import ThemesDisplay from '@/components/results/ThemesDisplay';
+import ExpertInsightsCard from '@/components/results/ExpertInsightsCard';
 import { Clock, Flame } from 'lucide-react';
 
 interface AnalysisOverviewProps {
@@ -15,6 +17,7 @@ interface AnalysisOverviewProps {
 const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({ data }) => {
   return (
     <div className="space-y-6">
+      {/* Charts Section */}
       <div className="dashboard-card">
         <h3 className="text-lg font-semibold mb-4">تتبع المشاعر عبر الوقت</h3>
         <LineChart 
@@ -27,7 +30,18 @@ const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({ data }) => {
           xAxisDataKey="date"
         />
       </div>
+
+      {/* Themes and Expert Insights */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {data.themes && data.themes.length > 0 && (
+          <ThemesDisplay themes={data.themes} />
+        )}
+        {data.expertInsights && (
+          <ExpertInsightsCard insights={data.expertInsights} />
+        )}
+      </div>
       
+      {/* Highlighted Tweets */}
       {data.highlightTweets && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.highlightTweets.earliest && (
@@ -48,6 +62,7 @@ const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({ data }) => {
         </div>
       )}
       
+      {/* Charts and Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="dashboard-card">
           <h3 className="text-lg font-semibold mb-4">توزيع المشاعر</h3>
@@ -74,6 +89,7 @@ const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({ data }) => {
         )}
       </div>
       
+      {/* Keywords and Influencers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="dashboard-card">
           <h3 className="text-lg font-semibold mb-4">الكلمات الرئيسية</h3>
