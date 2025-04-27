@@ -1,3 +1,4 @@
+
 import { get, post } from "@/api/apiClient";
 import API_ENDPOINTS from "@/api/apiUrls";
 import { SearchProgress } from "@/utils/searchStages";
@@ -190,14 +191,16 @@ export const executeSearch = async (
 /**
  * Transform tweets API response to our app's format
  */
-const transformTweetsResponse = (tweets: any[]): TweetSearchResults => {
+const transformTweetsResponse = (tweets: any): TweetSearchResults => {
   // Handle various response formats
   let tweetsList: any[] = [];
   
   if (Array.isArray(tweets)) {
     tweetsList = tweets;
-  } else if (tweets && typeof tweets === 'object' && 'results' in tweets && Array.isArray(tweets.results)) {
-    tweetsList = tweets.results;
+  } else if (tweets && typeof tweets === 'object' && 'results' in tweets) {
+    // Type narrowing to ensure TypeScript recognizes 'results' property
+    const tweetsWithResults = tweets as { results: any[] };
+    tweetsList = tweetsWithResults.results || [];
   }
   
   return {
