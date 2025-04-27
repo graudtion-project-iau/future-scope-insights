@@ -1,6 +1,14 @@
 
 import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse, ExpertInsights } from '@/types/search';
 
+// Define a type for engagement metrics to help TypeScript understand the structure
+interface EngagementMetrics {
+  likes?: number;
+  retweets?: number;
+  replies?: number;
+  quotes?: number;
+}
+
 export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOverviewData => {
   // Safety check for undefined input
   if (!apiData) {
@@ -34,11 +42,12 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     
     if (detailedAnalysis && detailedAnalysis.length > 0) {
       totalEngagement = detailedAnalysis.reduce((acc, tweet) => {
-        const metrics = tweet.engagement_metrics || {};
-        return acc + (metrics.likes || 0) + 
-              (metrics.retweets || 0) + 
-              (metrics.replies || 0) + 
-              (metrics.quotes || 0);
+        // Use optional chaining and type assertion to handle metrics
+        const metrics = tweet.engagement_metrics as EngagementMetrics || {};
+        return acc + (metrics?.likes || 0) + 
+              (metrics?.retweets || 0) + 
+              (metrics?.replies || 0) + 
+              (metrics?.quotes || 0);
       }, 0);
       
       avgEngagement = totalEngagement / detailedAnalysis.length;
@@ -48,17 +57,18 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     let mostEngagedTweet = null;
     if (detailedAnalysis && detailedAnalysis.length > 0) {
       mostEngagedTweet = detailedAnalysis.reduce((prev, current) => {
-        const prevMetrics = prev.engagement_metrics || {};
-        const currentMetrics = current.engagement_metrics || {};
+        // Use optional chaining and type assertion to handle metrics
+        const prevMetrics = prev.engagement_metrics as EngagementMetrics || {};
+        const currentMetrics = current.engagement_metrics as EngagementMetrics || {};
         
-        const prevEngagement = (prevMetrics.likes || 0) + 
-                            (prevMetrics.retweets || 0) + 
-                            (prevMetrics.replies || 0) + 
-                            (prevMetrics.quotes || 0);
-        const currentEngagement = (currentMetrics.likes || 0) + 
-                                (currentMetrics.retweets || 0) + 
-                                (currentMetrics.replies || 0) + 
-                                (currentMetrics.quotes || 0);
+        const prevEngagement = (prevMetrics?.likes || 0) + 
+                            (prevMetrics?.retweets || 0) + 
+                            (prevMetrics?.replies || 0) + 
+                            (prevMetrics?.quotes || 0);
+        const currentEngagement = (currentMetrics?.likes || 0) + 
+                                (currentMetrics?.retweets || 0) + 
+                                (currentMetrics?.replies || 0) + 
+                                (currentMetrics?.quotes || 0);
         return prevEngagement > currentEngagement ? prev : current;
       }, detailedAnalysis[0]);
     }
@@ -94,24 +104,29 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     ];
 
     // Transform tweets
-    const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => ({
-      id: tweet.tweet_id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
-      text: tweet.original_text || '',
-      user: {
-        id: tweet.tweet_id || `user-${Math.random().toString(36).substring(2, 9)}`,
-        name: tweet.metadata?.username || "مستخدم تويتر",
-        username: tweet.metadata?.username || "@user",
-        profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
-        verified: false,
-        followers: Math.floor(Math.random() * 10000)
-      },
-      date: tweet.metadata?.tweet_date || new Date().toISOString(),
-      likes: tweet.engagement_metrics?.likes || 0,
-      retweets: tweet.engagement_metrics?.retweets || 0,
-      quotes: tweet.engagement_metrics?.quotes || 0,
-      replies: tweet.engagement_metrics?.replies || 0,
-      sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
-    }));
+    const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => {
+      // Use type assertion to safely handle engagement metrics
+      const metrics = tweet.engagement_metrics as EngagementMetrics || {};
+      
+      return {
+        id: tweet.tweet_id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
+        text: tweet.original_text || '',
+        user: {
+          id: tweet.tweet_id || `user-${Math.random().toString(36).substring(2, 9)}`,
+          name: tweet.metadata?.username || "مستخدم تويتر",
+          username: tweet.metadata?.username || "@user",
+          profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+          verified: false,
+          followers: Math.floor(Math.random() * 10000)
+        },
+        date: tweet.metadata?.tweet_date || new Date().toISOString(),
+        likes: metrics?.likes || 0,
+        retweets: metrics?.retweets || 0,
+        quotes: metrics?.quotes || 0,
+        replies: metrics?.replies || 0,
+        sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
+      };
+    });
 
     // Create timeline data using mock data for now
     // In a real implementation, we would parse tweet dates
@@ -150,17 +165,23 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
         trend: Math.random() > 0.5 ? 'increase' : 'neutral'
       })),
       influencers: detailedAnalysis
-        .filter(tweet => tweet.engagement_metrics && (tweet.engagement_metrics.likes || 0) > 0)
+        .filter(tweet => {
+          const metrics = tweet.engagement_metrics as EngagementMetrics || {};
+          return metrics && (metrics?.likes || 0) > 0;
+        })
         .sort((a, b) => {
-          const aEngagement = (a.engagement_metrics?.likes || 0) + (a.engagement_metrics?.retweets || 0);
-          const bEngagement = (b.engagement_metrics?.likes || 0) + (b.engagement_metrics?.retweets || 0);
+          const aMetrics = a.engagement_metrics as EngagementMetrics || {};
+          const bMetrics = b.engagement_metrics as EngagementMetrics || {};
+          const aEngagement = (aMetrics?.likes || 0) + (aMetrics?.retweets || 0);
+          const bEngagement = (bMetrics?.likes || 0) + (bMetrics?.retweets || 0);
           return bEngagement - aEngagement;
         })
         .slice(0, 5)
         .map(tweet => ({
           name: tweet.metadata?.username || "مستخدم تويتر",
           followers: Math.floor(Math.random() * 10000).toString(),
-          engagement: (((tweet.engagement_metrics?.likes || 0) + (tweet.engagement_metrics?.retweets || 0)) / 100).toFixed(1) + '%',
+          engagement: (((tweet.engagement_metrics as EngagementMetrics)?.likes || 0) + 
+                      ((tweet.engagement_metrics as EngagementMetrics)?.retweets || 0)) / 100).toFixed(1) + '%',
           image: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`
         })),
       highlightTweets: {
