@@ -1,4 +1,3 @@
-
 export interface Tweet {
   id: string;
   text: string;
@@ -9,17 +8,35 @@ export interface Tweet {
     profileImage: string;
     verified: boolean;
     followers: number;
+    description?: string;
+    location?: string;
+    joinDate?: string;
+    tweetsCount?: number;
+    likesCount?: number;
   };
   date: string;
+  url?: string;
+  source?: string;
   likes: number;
   retweets: number;
   quotes: number;
   replies: number;
+  viewCount?: number;
+  bookmarkCount?: number;
   sentiment: 'positive' | 'neutral' | 'negative';
   media?: {
-    type: 'image' | 'video';
+    type: 'photo' | 'video';
     url: string;
+    sizes?: {
+      large: { h: number; w: number };
+      medium: { h: number; w: number };
+      small: { h: number; w: number };
+    };
   }[];
+  keyPoints?: string[];
+  isRetweet?: boolean;
+  isReply?: boolean;
+  language?: string;
 }
 
 export interface TweetSearchResults {

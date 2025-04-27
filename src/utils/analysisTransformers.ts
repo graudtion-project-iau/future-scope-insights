@@ -1,16 +1,53 @@
 
 import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse, ExpertInsights } from '@/types/search';
 
-// Define a type for engagement metrics to help TypeScript understand the structure
+// Define interfaces for the rich metadata
+interface TweetMetadata {
+  username: string;
+  tweet_date: string;
+  tweet_url: string;
+  has_media: boolean;
+  media_count: number;
+  is_retweet: boolean;
+  is_reply: boolean;
+  language: string;
+  user?: {
+    username: string;
+    full_name: string;
+    profile_image: string;
+    verified: boolean;
+    followers_count: number;
+    description: string;
+    location: string;
+    created_at: string;
+    statuses_count: number;
+    favorites_count: number;
+    media_count: number;
+  };
+  tweet?: {
+    view_count?: number;
+    bookmark_count?: number;
+    source?: string;
+  };
+  media?: {
+    media_url_https: string;
+    type: 'photo' | 'video';
+    sizes?: {
+      large: { h: number; w: number };
+      medium: { h: number; w: number };
+      small: { h: number; w: number };
+    };
+  }[];
+}
+
 interface EngagementMetrics {
-  likes?: number;
-  retweets?: number;
-  replies?: number;
-  quotes?: number;
+  likes: number;
+  retweets: number;
+  replies: number;
+  quotes: number;
 }
 
 export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOverviewData => {
-  // Safety check for undefined input
   if (!apiData) {
     console.error("Invalid API data received:", apiData);
     return createEmptyAnalysisData();
@@ -19,61 +56,84 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
   try {
     console.log("API data received:", apiData);
     
-    // Extract sentiment counts
+    // Extract sentiment counts and percentages
     const sentimentCounts = apiData.sentiment_counts || {
       positive: 0,
       negative: 0,
       neutral: 0
     };
     
-    // Extract percentages
     const percentages = apiData.percentages || {
       positive: 0,
       negative: 0,
       neutral: 0
     };
 
-    // Extract detailed analysis
     const detailedAnalysis = apiData.detailed_analysis || [];
     
-    // Calculate engagement stats if detailed_analysis exists
+    // Calculate engagement stats
     let totalEngagement = 0;
     let avgEngagement = 0;
     
     if (detailedAnalysis && detailedAnalysis.length > 0) {
       totalEngagement = detailedAnalysis.reduce((acc, tweet) => {
-        // Use optional chaining and type assertion to handle metrics
-        const metrics = tweet.engagement_metrics as EngagementMetrics || {};
-        return acc + (metrics?.likes || 0) + 
-              (metrics?.retweets || 0) + 
-              (metrics?.replies || 0) + 
-              (metrics?.quotes || 0);
+        const metrics = tweet.engagement_metrics || {};
+        return acc + (metrics.likes || 0) + 
+              (metrics.retweets || 0) + 
+              (metrics.replies || 0) + 
+              (metrics.quotes || 0);
       }, 0);
       
       avgEngagement = totalEngagement / detailedAnalysis.length;
     }
 
-    // Find most engaged tweet if detailed_analysis exists
-    let mostEngagedTweet = null;
-    if (detailedAnalysis && detailedAnalysis.length > 0) {
-      mostEngagedTweet = detailedAnalysis.reduce((prev, current) => {
-        // Use optional chaining and type assertion to handle metrics
-        const prevMetrics = prev.engagement_metrics as EngagementMetrics || {};
-        const currentMetrics = current.engagement_metrics as EngagementMetrics || {};
-        
-        const prevEngagement = (prevMetrics?.likes || 0) + 
-                            (prevMetrics?.retweets || 0) + 
-                            (prevMetrics?.replies || 0) + 
-                            (prevMetrics?.quotes || 0);
-        const currentEngagement = (currentMetrics?.likes || 0) + 
-                                (currentMetrics?.retweets || 0) + 
-                                (currentMetrics?.replies || 0) + 
-                                (currentMetrics?.quotes || 0);
-        return prevEngagement > currentEngagement ? prev : current;
-      }, detailedAnalysis[0]);
-    }
+    // Find most engaged tweet
+    const mostEngagedTweet = detailedAnalysis?.[0];
 
-    // Create KPIs
+    // Transform tweets with rich metadata
+    const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => {
+      const metadata = tweet.metadata as TweetMetadata;
+      const metrics = tweet.engagement_metrics as EngagementMetrics || {};
+      
+      return {
+        id: tweet.tweet_id,
+        text: tweet.original_text || '',
+        user: {
+          id: metadata.user?.username || 'anonymous',
+          name: metadata.user?.full_name || metadata.username || "مستخدم تويتر",
+          username: metadata.user?.username || metadata.username || "@user",
+          profileImage: metadata.user?.profile_image || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+          verified: metadata.user?.verified || false,
+          followers: metadata.user?.followers_count || 0,
+          description: metadata.user?.description || '',
+          location: metadata.user?.location || '',
+          joinDate: metadata.user?.created_at || '',
+          tweetsCount: metadata.user?.statuses_count || 0,
+          likesCount: metadata.user?.favorites_count || 0
+        },
+        date: metadata.tweet_date || new Date().toISOString(),
+        url: metadata.tweet_url || '',
+        source: metadata.tweet?.source || '',
+        likes: metrics.likes || 0,
+        retweets: metrics.retweets || 0,
+        quotes: metrics.quotes || 0,
+        replies: metrics.replies || 0,
+        viewCount: metadata.tweet?.view_count,
+        bookmarkCount: metadata.tweet?.bookmark_count,
+        sentiment: tweet.sentiment as 'positive' | 'neutral' | 'negative',
+        media: metadata.media?.map(m => ({
+          type: m.type,
+          url: m.media_url_https,
+          sizes: m.sizes
+        })) || [],
+        keyPoints: tweet.key_points || [],
+        isRetweet: metadata.is_retweet,
+        isReply: metadata.is_reply,
+        language: metadata.language
+      };
+    });
+
+    // Create KPIs with extended metrics
     const kpis: KPIItem[] = [
       {
         name: "نسبة المشاعر الإيجابية",
@@ -103,93 +163,62 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
       }
     ];
 
-    // Transform tweets
-    const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => {
-      // Use type assertion to safely handle engagement metrics
-      const metrics = tweet.engagement_metrics as EngagementMetrics || {};
-      
-      return {
-        id: tweet.tweet_id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
-        text: tweet.original_text || '',
-        user: {
-          id: tweet.tweet_id || `user-${Math.random().toString(36).substring(2, 9)}`,
-          name: tweet.metadata?.username || "مستخدم تويتر",
-          username: tweet.metadata?.username || "@user",
-          profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
-          verified: false,
-          followers: Math.floor(Math.random() * 10000)
-        },
-        date: tweet.metadata?.tweet_date || new Date().toISOString(),
-        likes: metrics?.likes || 0,
-        retweets: metrics?.retweets || 0,
-        quotes: metrics?.quotes || 0,
-        replies: metrics?.replies || 0,
-        sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
-      };
-    });
-
-    // Create timeline data using mock data for now
-    // In a real implementation, we would parse tweet dates
-    const timeline = [
-      { date: "اليوم 1", إيجابي: sentimentCounts.positive * 0.3, محايد: sentimentCounts.neutral * 0.3, سلبي: sentimentCounts.negative * 0.3 },
-      { date: "اليوم 2", إيجابي: sentimentCounts.positive * 0.4, محايد: sentimentCounts.neutral * 0.4, سلبي: sentimentCounts.negative * 0.4 },
-      { date: "اليوم 3", إيجابي: sentimentCounts.positive * 0.6, محايد: sentimentCounts.neutral * 0.6, سلبي: sentimentCounts.negative * 0.6 },
-      { date: "اليوم 4", إيجابي: sentimentCounts.positive * 0.8, محايد: sentimentCounts.neutral * 0.8, سلبي: sentimentCounts.negative * 0.8 },
-      { date: "اليوم 5", إيجابي: sentimentCounts.positive, محايد: sentimentCounts.neutral, سلبي: sentimentCounts.negative }
-    ];
-
-    // Sort tweets by date to find earliest and latest
+    // Sort tweets and find highlights
     const sortedTweets = [...transformedTweets].sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     const earliestTweet = sortedTweets[0];
     const latestTweet = sortedTweets[sortedTweets.length - 1];
-
-    // Sort tweets by likes to find the most liked
     const mostLikedTweet = [...transformedTweets].sort((a, b) => b.likes - a.likes)[0];
+
+    // Calculate rich influencer metrics
+    const influencers = detailedAnalysis
+      .filter(tweet => {
+        const metrics = tweet.engagement_metrics as EngagementMetrics || {};
+        return metrics && (metrics.likes || 0) > 0 && tweet.metadata?.user;
+      })
+      .sort((a, b) => {
+        const aMetrics = a.engagement_metrics as EngagementMetrics || {};
+        const bMetrics = b.engagement_metrics as EngagementMetrics || {};
+        const aEngagement = (aMetrics.likes || 0) + (aMetrics.retweets || 0);
+        const bEngagement = (bMetrics.likes || 0) + (bMetrics.retweets || 0);
+        return bEngagement - aEngagement;
+      })
+      .slice(0, 5)
+      .map(tweet => {
+        const metrics = tweet.engagement_metrics as EngagementMetrics;
+        const user = (tweet.metadata as TweetMetadata).user;
+        const engagementValue = ((metrics?.likes || 0) + (metrics?.retweets || 0) / user?.followers_count || 1 * 100).toFixed(1) + '%';
+        
+        return {
+          name: user?.full_name || tweet.metadata?.username || "مستخدم تويتر",
+          followers: (user?.followers_count || 0).toLocaleString(),
+          engagement: engagementValue,
+          image: user?.profile_image || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+          description: user?.description || '',
+          location: user?.location || ''
+        };
+      });
 
     return {
       query: "تحليل التغريدات",
       total: detailedAnalysis.length,
-      sentiment: {
-        positive: sentimentCounts.positive || 0,
-        neutral: sentimentCounts.neutral || 0,
-        negative: sentimentCounts.negative || 0,
-      },
+      sentiment: sentimentCounts,
       kpis,
-      timeline,
+      timeline: [
+        { date: "اليوم 1", إيجابي: sentimentCounts.positive * 0.3, محايد: sentimentCounts.neutral * 0.3, سلبي: sentimentCounts.negative * 0.3 },
+        { date: "اليوم 2", إيجابي: sentimentCounts.positive * 0.4, محايد: sentimentCounts.neutral * 0.4, سلبي: sentimentCounts.negative * 0.4 },
+        { date: "اليوم 3", إيجابي: sentimentCounts.positive * 0.6, محايد: sentimentCounts.neutral * 0.6, سلبي: sentimentCounts.negative * 0.6 },
+        { date: "اليوم 4", إيجابي: sentimentCounts.positive * 0.8, محايد: sentimentCounts.neutral * 0.8, سلبي: sentimentCounts.negative * 0.8 },
+        { date: "اليوم 5", إيجابي: sentimentCounts.positive, محايد: sentimentCounts.neutral, سلبي: sentimentCounts.negative }
+      ],
       keywords: (apiData.themes || []).map(theme => ({
         keyword: theme,
         count: Math.floor(Math.random() * 100),
         trend: Math.random() > 0.5 ? 'increase' : 'neutral'
       })),
-      influencers: detailedAnalysis
-        .filter(tweet => {
-          const metrics = tweet.engagement_metrics as EngagementMetrics || {};
-          return metrics && (metrics?.likes || 0) > 0;
-        })
-        .sort((a, b) => {
-          const aMetrics = a.engagement_metrics as EngagementMetrics || {};
-          const bMetrics = b.engagement_metrics as EngagementMetrics || {};
-          const aEngagement = (aMetrics?.likes || 0) + (aMetrics?.retweets || 0);
-          const bEngagement = (bMetrics?.likes || 0) + (bMetrics?.retweets || 0);
-          return bEngagement - aEngagement;
-        })
-        .slice(0, 5)
-        .map(tweet => {
-          // Fixed the parentheses issue in the calculation
-          const likes = (tweet.engagement_metrics as EngagementMetrics)?.likes || 0;
-          const retweets = (tweet.engagement_metrics as EngagementMetrics)?.retweets || 0;
-          const engagementValue = ((likes + retweets) / 100).toFixed(1) + '%';
-          
-          return {
-            name: tweet.metadata?.username || "مستخدم تويتر",
-            followers: Math.floor(Math.random() * 10000).toString(),
-            engagement: engagementValue,
-            image: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`
-          };
-        }),
+      influencers,
       highlightTweets: {
         earliest: earliestTweet,
         mostLiked: mostLikedTweet,
@@ -209,7 +238,6 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
   }
 };
 
-// Helper function to create empty analysis data when API response is invalid
 function createEmptyAnalysisData(): AnalysisOverviewData {
   return {
     query: "تحليل التغريدات",
