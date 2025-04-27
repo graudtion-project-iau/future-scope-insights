@@ -1,16 +1,7 @@
-
 import React from 'react';
 import { Activity, Users, MapPin, BarChart2, Clock, Bell, Database } from 'lucide-react';
 import DataCard from '@/components/DataCard';
-
-interface KPIItem {
-  name: string;
-  value: string | number;
-  change?: number;
-  lastUpdate?: string;
-  type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime';
-  color?: string;
-}
+import { KPIItem } from '@/types/search';
 
 interface KPICardsProps {
   kpis?: KPIItem[];
@@ -30,7 +21,6 @@ const KPICards: React.FC<KPICardsProps> = ({
   ],
   className = ""
 }) => {
-  // Map KPI names to icons and colors
   const getIconForKPI = (kpi: KPIItem) => {
     const type = kpi.type?.toLowerCase() || '';
     
@@ -78,7 +68,6 @@ const KPICards: React.FC<KPICardsProps> = ({
     return '';
   };
 
-  // Get subset of cards to show
   const visibleKpis = kpis.slice(0, 8);
 
   return (
