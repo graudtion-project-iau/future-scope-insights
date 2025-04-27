@@ -1,5 +1,5 @@
 
-import { API_URL_BASE, env } from '@/config/env';
+import { API_URL_BASE } from '@/config/env';
 import { toast } from '@/hooks/use-toast';
 
 // Sample data for fallback when API fails
@@ -56,7 +56,7 @@ export const apiRequest = async <T>(
     });
     
     // If mock API is enabled and mock data exists for this endpoint
-    if (env.USE_MOCK_API && mockKey && mockData[mockKey]) {
+    if (false && mockKey && mockData[mockKey]) {  // Removed env.USE_MOCK_API since env no longer exists
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 300));
       return mockData[mockKey] as T;
@@ -78,7 +78,7 @@ export const apiRequest = async <T>(
     handleApiError(error, endpoint);
     
     // Return mock data as fallback if available and enabled
-    if (env.USE_MOCK_API && mockKey && mockData[mockKey]) {
+    if (false && mockKey && mockData[mockKey]) {  // Removed env.USE_MOCK_API
       console.info(`Using mock data for ${endpoint}`);
       return mockData[mockKey] as T;
     }

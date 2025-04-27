@@ -117,7 +117,7 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
 
       return {
         id: tweet.tweet_id,
-        text: tweet.original_text,
+        text: tweet.original_text || '',
         user: {
           id: userInfo.username || metadata.username || '',
           name: userInfo.full_name || userInfo.username || metadata.username || "مستخدم تويتر",

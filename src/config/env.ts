@@ -17,6 +17,7 @@ export const APP_CONFIG = {
   MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
   SUPPORTED_LOCALES: ['ar', 'en'],
   DEFAULT_LOCALE: 'ar',
+  USE_MOCK_API: false, // Flag for enabling/disabling API mocking
 };
 
 // Maps configuration
