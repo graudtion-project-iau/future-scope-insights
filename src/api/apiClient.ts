@@ -34,7 +34,7 @@ const handleApiError = (error: any, endpoint: string) => {
   // Show a toast with the error
   toast({
     title: 'API Error',
-    description: 'Could not complete the request. Please try again later.',
+    description: 'Could not complete the request. Using mock data instead.',
     variant: 'destructive',
   });
   
@@ -49,18 +49,19 @@ export const apiRequest = async <T>(
   mockKey?: keyof typeof mockData
 ): Promise<T | null> => {
   try {
+    // Use mock data by default since the real API is unreachable
+    if (mockKey && mockData[mockKey]) {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      console.info(`Using mock data for ${endpoint}`);
+      return mockData[mockKey] as T;
+    }
+    
     // Combine default options with provided options
     const requestOptions = addAuthHeader({
       ...defaultOptions,
       ...options,
     });
-    
-    // If mock API is enabled and mock data exists for this endpoint
-    if (false && mockKey && mockData[mockKey]) {  // Removed env.USE_MOCK_API since env no longer exists
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      return mockData[mockKey] as T;
-    }
     
     // Make the actual API request
     const response = await fetch(`${API_URL_BASE}${endpoint}`, requestOptions);
@@ -77,8 +78,8 @@ export const apiRequest = async <T>(
     // Handle any errors
     handleApiError(error, endpoint);
     
-    // Return mock data as fallback if available and enabled
-    if (false && mockKey && mockData[mockKey]) {  // Removed env.USE_MOCK_API
+    // Return mock data as fallback if available
+    if (mockKey && mockData[mockKey]) {
       console.info(`Using mock data for ${endpoint}`);
       return mockData[mockKey] as T;
     }

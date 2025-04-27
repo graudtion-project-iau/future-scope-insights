@@ -104,7 +104,7 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
 
     // Transform tweets with rich metadata
     const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => {
-      const metadata = tweet.metadata;
+      const metadata = tweet.metadata || {} as TweetMetadata;
       // Use type assertion to ensure TypeScript recognizes userInfo properties
       const userInfo = (metadata.user || {}) as NonNullable<typeof metadata.user>;
       
@@ -131,8 +131,8 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
           tweetsCount: userInfo.statuses_count || 0,
           likesCount: userInfo.favorites_count || 0
         },
-        date: metadata.tweet_date,
-        url: metadata.tweet_url,
+        date: metadata.tweet_date || new Date().toISOString(),
+        url: metadata.tweet_url || '',
         source: metadata.tweet?.source || '',
         likes: tweet.engagement_metrics?.likes || 0,
         retweets: tweet.engagement_metrics?.retweets || 0,
@@ -142,10 +142,10 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
         bookmarkCount: metadata.tweet?.bookmark_count || 0,
         sentiment: tweet.sentiment as 'positive' | 'neutral' | 'negative',
         media: mediaItems,
-        keyPoints: tweet.key_points,
-        isRetweet: metadata.is_retweet,
-        isReply: metadata.is_reply,
-        language: metadata.language
+        keyPoints: tweet.key_points || [],
+        isRetweet: metadata.is_retweet || false,
+        isReply: metadata.is_reply || false,
+        language: metadata.language || 'ar'
       };
     });
 
