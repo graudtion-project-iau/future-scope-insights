@@ -1,4 +1,3 @@
-
 import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse } from '@/types/search';
 
 // Define interfaces for API response types
@@ -118,17 +117,17 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
         id: tweet.tweet_id,
         text: tweet.original_text,
         user: {
-          id: userInfo.username || metadata.username,
-          name: userInfo.full_name || metadata.username || "مستخدم تويتر",
-          username: userInfo.username || metadata.username,
+          id: userInfo.username || metadata.username || '',
+          name: userInfo.full_name || userInfo.username || metadata.username || "مستخدم تويتر",
+          username: userInfo.username || metadata.username || '',
           profileImage: userInfo.profile_image || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
-          verified: userInfo.verified || false,
+          verified: userInfo.verified ?? false,
           followers: userInfo.followers_count || 0,
-          description: userInfo.description,
-          location: userInfo.location,
-          joinDate: userInfo.created_at,
-          tweetsCount: userInfo.statuses_count,
-          likesCount: userInfo.favorites_count
+          description: userInfo.description || '',
+          location: userInfo.location || '',
+          joinDate: userInfo.created_at || new Date().toISOString(),
+          tweetsCount: userInfo.statuses_count || 0,
+          likesCount: userInfo.favorites_count || 0
         },
         date: metadata.tweet_date,
         url: metadata.tweet_url,

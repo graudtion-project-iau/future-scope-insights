@@ -1,4 +1,3 @@
-
 import { get, post } from "@/api/apiClient";
 import API_ENDPOINTS from "@/api/apiUrls";
 import { SearchProgress } from "@/utils/searchStages";
@@ -30,12 +29,12 @@ export const executeSearch = async (
       message: 'بدء البحث وجمع التغريدات'
     });
     
-    // Call the create search query endpoint
+    // Call the create search query endpoint with maxItems: 5
     const searchQueryParams = {
       query: query,
       search_type: "twitter",
       parameters: {
-        maxItems: 100,
+        maxItems: 5,
         sort: "Top"
       },
       status: "pending"
