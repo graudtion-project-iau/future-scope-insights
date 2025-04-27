@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -127,23 +128,30 @@ const Results = () => {
         if (sampleData) {
           setOverview(sampleData);
           setTweetResults(getSampleTweets(searchQuery));
+          setLoading(false);
           return;
         }
       }
 
-      // Use report ID 1 as default for testing
-      const endpoint = `${API_ENDPOINTS.analysis.overview}1/`;
+      // Fetch analysis data - Try to use the most recent report for simplicity
+      const endpoint = `${API_ENDPOINTS.analysis.overview}`;
       console.log("Fetching analysis data from:", endpoint);
-      const response = await get<APIAnalysisResponse>(endpoint);
       
-      if (response) {
-        console.log("Analysis data received:", response);
-        const transformedData = transformAnalysisData(response);
+      // First try to get a list of reports
+      const reportsResponse = await get<APIAnalysisResponse[]>(endpoint);
+      
+      if (reportsResponse && reportsResponse.length > 0) {
+        console.log("Analysis data received:", reportsResponse);
+        
+        // Get the most recent report
+        const mostRecentReport = reportsResponse[0];
+        
+        const transformedData = transformAnalysisData(mostRecentReport);
         setOverview(transformedData);
         
         // If we have detailed_analysis, use it for tweets
-        if (response.detailed_analysis && response.detailed_analysis.length > 0) {
-          const tweets = response.detailed_analysis.map(tweet => ({
+        if (mostRecentReport.detailed_analysis && mostRecentReport.detailed_analysis.length > 0) {
+          const tweets = mostRecentReport.detailed_analysis.map(tweet => ({
             id: tweet.tweet_id,
             text: tweet.original_text || '',
             user: {
@@ -182,11 +190,48 @@ const Results = () => {
           });
         }
       } else {
-        toast({
-          title: "خطأ في تحميل البيانات",
-          description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
-          variant: "destructive",
-        });
+        // Try to get a specific report
+        const specificReportResponse = await get<APIAnalysisResponse>(`${endpoint}1/`);
+        if (specificReportResponse) {
+          console.log("Specific report data received:", specificReportResponse);
+          const transformedData = transformAnalysisData(specificReportResponse);
+          setOverview(transformedData);
+          
+          // Process tweets from the detailed analysis
+          if (specificReportResponse.detailed_analysis && specificReportResponse.detailed_analysis.length > 0) {
+            const tweets = specificReportResponse.detailed_analysis.map(tweet => ({
+              id: tweet.tweet_id,
+              text: tweet.original_text || '',
+              user: {
+                id: tweet.tweet_id,
+                name: tweet.metadata?.username || "مستخدم تويتر",
+                username: tweet.metadata?.username || "@user",
+                profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+                verified: false,
+                followers: Math.floor(Math.random() * 10000)
+              },
+              date: tweet.metadata?.tweet_date || new Date().toISOString(),
+              likes: tweet.engagement_metrics?.likes || 0,
+              retweets: tweet.engagement_metrics?.retweets || 0,
+              quotes: tweet.engagement_metrics?.quotes || 0,
+              replies: tweet.engagement_metrics?.replies || 0,
+              sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
+            }));
+            
+            setTweetResults({
+              total: tweets.length,
+              page: 1,
+              pages: 1,
+              tweets
+            });
+          }
+        } else {
+          toast({
+            title: "خطأ في تحميل البيانات",
+            description: "لم نتمكن من تحميل بيانات التحليل. الرجاء المحاولة مرة أخرى.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching analysis data:", error);
@@ -205,74 +250,65 @@ const Results = () => {
     try {
       const currentFilters = newFilters || filters;
       
-      if (isWorldCupMatch) {
+      if (isSampleQuery(searchQuery)) {
+        const sampleTweets = getSampleTweets(searchQuery);
+        setTweetResults(sampleTweets);
+        setLoading(false);
+        return;
+      }
+
+      // Get tweets from the API
+      const filterParams = [
+        `page=${page}`,
+      ].filter(Boolean).join('&');
+      
+      const endpoint = `${API_ENDPOINTS.analysis.tweets}${filterParams ? '?' + filterParams : ''}`;
+      console.log("Fetching tweets from:", endpoint);
+      
+      const response = await get<any>(endpoint);
+      
+      if (response) {
+        console.log("Tweets data received:", response);
+        
+        // Handle both formats: array of tweets or object with results array
+        let tweets: any[] = [];
+        if (Array.isArray(response)) {
+          tweets = response;
+        } else if (response.results && Array.isArray(response.results)) {
+          tweets = response.results;
+        }
+        
+        const transformedTweets = tweets.map(tweet => ({
+          id: tweet.tweet_id || tweet.id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
+          text: tweet.original_text || tweet.text || '',
+          user: {
+            id: tweet.user_id || `user-${Math.random().toString(36).substring(2, 9)}`,
+            name: tweet.username || tweet.user_name || "مستخدم تويتر",
+            username: tweet.username || "@user",
+            profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
+            verified: false,
+            followers: Math.floor(Math.random() * 10000)
+          },
+          date: tweet.tweet_date || tweet.date || tweet.metadata?.tweet_date || new Date().toISOString(),
+          likes: tweet.likes || (tweet.engagement_metrics?.likes || 0),
+          retweets: tweet.retweets || (tweet.engagement_metrics?.retweets || 0),
+          quotes: tweet.quotes || (tweet.engagement_metrics?.quotes || 0),
+          replies: tweet.replies || (tweet.engagement_metrics?.replies || 0),
+          sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
+        }));
+        
         setTweetResults({
-          total: worldCupSampleTweets.tweets.length,
-          page: 1,
-          pages: 1,
-          tweets: worldCupSampleTweets.tweets
-        });
-      } else if (isKhobzEvent) {
-        setTweetResults({
-          total: khobzSampleTweets.tweets.length,
-          page: 1,
-          pages: 1,
-          tweets: khobzSampleTweets.tweets
+          total: transformedTweets.length,
+          page,
+          pages: Math.ceil(transformedTweets.length / 20),
+          tweets: transformedTweets
         });
       } else {
-        const filterParams = [
-          `search_query=1`, // Use fixed search query ID 1 for testing
-          `page=${page}`,
-        ].filter(Boolean).join('&');
-        
-        const endpoint = `${API_ENDPOINTS.analysis.tweets}?${filterParams}`;
-        console.log("Fetching tweets from:", endpoint);
-        
-        const response = await get<any>(endpoint);
-        
-        if (response) {
-          console.log("Tweets data received:", response);
-          
-          // Handle both formats: array of tweets or object with results array
-          let tweets: any[] = [];
-          if (Array.isArray(response)) {
-            tweets = response;
-          } else if (response.results && Array.isArray(response.results)) {
-            tweets = response.results;
-          }
-          
-          const transformedTweets = tweets.map(tweet => ({
-            id: tweet.tweet_id || tweet.id,
-            text: tweet.original_text || tweet.text || '',
-            user: {
-              id: tweet.user_id || `user-${Math.random().toString(36).substring(2, 9)}`,
-              name: tweet.username || "مستخدم تويتر",
-              username: tweet.username || "@user",
-              profileImage: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
-              verified: false,
-              followers: Math.floor(Math.random() * 10000)
-            },
-            date: tweet.tweet_date || tweet.date || new Date().toISOString(),
-            likes: tweet.likes || 0,
-            retweets: tweet.retweets || 0,
-            quotes: tweet.quotes || 0,
-            replies: tweet.replies || 0,
-            sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative'
-          }));
-          
-          setTweetResults({
-            total: transformedTweets.length,
-            page,
-            pages: Math.ceil(transformedTweets.length / 20),
-            tweets: transformedTweets
-          });
-        } else {
-          toast({
-            title: "خطأ في تحميل التغريدات",
-            description: "لم نتمكن من تحميل التغريدات. الرجاء المحاولة مرة أخرى.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "خطأ في تحميل التغريدات",
+          description: "لم نتمكن من تحميل التغريدات. الرجاء المحاولة مرة أخرى.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching tweets:", error);

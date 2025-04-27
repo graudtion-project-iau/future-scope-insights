@@ -2,7 +2,7 @@
 // Environment variables configuration
 
 // Set the API URL from environment or use the provided API URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://185.234.69.45:8001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://185.234.69.45:8001';
 const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://future-scope-insights.com';
 
 // Configuration object with all environment variables
