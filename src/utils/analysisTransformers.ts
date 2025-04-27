@@ -1,5 +1,5 @@
 
-import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse, ExpertInsights } from '@/types/search';
+import { AnalysisOverviewData, KPIItem, Tweet, APIAnalysisResponse } from '@/types/search';
 
 // Define interfaces for the rich metadata
 interface TweetMetadata {
@@ -77,7 +77,7 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     
     if (detailedAnalysis && detailedAnalysis.length > 0) {
       totalEngagement = detailedAnalysis.reduce((acc, tweet) => {
-        const metrics = tweet.engagement_metrics || {};
+        const metrics = tweet.engagement_metrics || {} as EngagementMetrics;
         return acc + (metrics.likes || 0) + 
               (metrics.retweets || 0) + 
               (metrics.replies || 0) + 
@@ -92,9 +92,16 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
 
     // Transform tweets with rich metadata
     const transformedTweets: Tweet[] = detailedAnalysis.map(tweet => {
-      const metadata = tweet.metadata as TweetMetadata;
-      const metrics = tweet.engagement_metrics as EngagementMetrics || {};
+      const metadata = tweet.metadata as TweetMetadata || {};
+      const metrics = tweet.engagement_metrics || {} as EngagementMetrics;
       
+      // Convert media type from 'photo' to 'image' to match our interface
+      const mediaItems = metadata.media?.map(media => ({
+        type: media.type === 'photo' ? 'image' as const : 'video' as const,
+        url: media.media_url_https,
+        sizes: media.sizes
+      })) || [];
+
       return {
         id: tweet.tweet_id,
         text: tweet.original_text || '',
@@ -121,47 +128,13 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
         viewCount: metadata.tweet?.view_count,
         bookmarkCount: metadata.tweet?.bookmark_count,
         sentiment: tweet.sentiment as 'positive' | 'neutral' | 'negative',
-        media: metadata.media?.map(m => ({
-          type: m.type,
-          url: m.media_url_https,
-          sizes: m.sizes
-        })) || [],
+        media: mediaItems,
         keyPoints: tweet.key_points || [],
         isRetweet: metadata.is_retweet,
         isReply: metadata.is_reply,
         language: metadata.language
       };
     });
-
-    // Create KPIs with extended metrics
-    const kpis: KPIItem[] = [
-      {
-        name: "نسبة المشاعر الإيجابية",
-        value: `${percentages.positive?.toFixed(1) || 0}%`,
-        type: "sentiment",
-        change: (percentages.positive || 0) > 50 ? 1 : -1,
-        color: (percentages.positive || 0) > 50 ? 'green' : 'red'
-      },
-      {
-        name: "متوسط التفاعل",
-        value: avgEngagement.toFixed(0),
-        type: "engagement",
-        change: avgEngagement > 100 ? 1 : -1,
-        color: avgEngagement > 100 ? 'green' : 'yellow'
-      },
-      {
-        name: "عدد التغريدات",
-        value: detailedAnalysis.length.toString(),
-        type: "mentions",
-        color: 'blue'
-      },
-      {
-        name: "الموضوعات الرئيسية",
-        value: (apiData.themes?.length || 0).toString(),
-        type: "keywords",
-        color: 'purple'
-      }
-    ];
 
     // Sort tweets and find highlights
     const sortedTweets = [...transformedTweets].sort((a, b) => 
@@ -175,29 +148,31 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
     // Calculate rich influencer metrics
     const influencers = detailedAnalysis
       .filter(tweet => {
-        const metrics = tweet.engagement_metrics as EngagementMetrics || {};
-        return metrics && (metrics.likes || 0) > 0 && tweet.metadata?.user;
+        const metrics = tweet.engagement_metrics || {} as EngagementMetrics;
+        const hasMeaningfulEngagement = metrics && metrics.likes > 0;
+        const hasUserData = tweet.metadata && tweet.metadata.user;
+        return hasMeaningfulEngagement && hasUserData;
       })
       .sort((a, b) => {
-        const aMetrics = a.engagement_metrics as EngagementMetrics || {};
-        const bMetrics = b.engagement_metrics as EngagementMetrics || {};
+        const aMetrics = a.engagement_metrics || {} as EngagementMetrics;
+        const bMetrics = b.engagement_metrics || {} as EngagementMetrics;
         const aEngagement = (aMetrics.likes || 0) + (aMetrics.retweets || 0);
         const bEngagement = (bMetrics.likes || 0) + (bMetrics.retweets || 0);
         return bEngagement - aEngagement;
       })
       .slice(0, 5)
       .map(tweet => {
-        const metrics = tweet.engagement_metrics as EngagementMetrics;
-        const user = (tweet.metadata as TweetMetadata).user;
-        const engagementValue = ((metrics?.likes || 0) + (metrics?.retweets || 0) / user?.followers_count || 1 * 100).toFixed(1) + '%';
+        const metrics = tweet.engagement_metrics || {} as EngagementMetrics;
+        const user = tweet.metadata?.user;
+        const followersCount = user?.followers_count || 1; // Avoid division by zero
+        const likesAndRetweets = (metrics.likes || 0) + (metrics.retweets || 0);
+        const engagementValue = ((likesAndRetweets / followersCount) * 100).toFixed(1) + '%';
         
         return {
           name: user?.full_name || tweet.metadata?.username || "مستخدم تويتر",
           followers: (user?.followers_count || 0).toLocaleString(),
           engagement: engagementValue,
           image: user?.profile_image || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 10)}.jpg`,
-          description: user?.description || '',
-          location: user?.location || ''
         };
       });
 
@@ -205,7 +180,34 @@ export const transformAnalysisData = (apiData: APIAnalysisResponse): AnalysisOve
       query: "تحليل التغريدات",
       total: detailedAnalysis.length,
       sentiment: sentimentCounts,
-      kpis,
+      kpis: [
+        {
+          name: "نسبة المشاعر الإيجابية",
+          value: `${percentages.positive?.toFixed(1) || 0}%`,
+          type: "sentiment",
+          change: (percentages.positive || 0) > 50 ? 1 : -1,
+          color: (percentages.positive || 0) > 50 ? 'green' : 'red'
+        },
+        {
+          name: "متوسط التفاعل",
+          value: avgEngagement.toFixed(0),
+          type: "engagement",
+          change: avgEngagement > 100 ? 1 : -1,
+          color: avgEngagement > 100 ? 'green' : 'yellow'
+        },
+        {
+          name: "عدد التغريدات",
+          value: detailedAnalysis.length.toString(),
+          type: "mentions",
+          color: 'blue'
+        },
+        {
+          name: "الموضوعات الرئيسية",
+          value: (apiData.themes?.length || 0).toString(),
+          type: "keywords",
+          color: 'purple'
+        }
+      ],
       timeline: [
         { date: "اليوم 1", إيجابي: sentimentCounts.positive * 0.3, محايد: sentimentCounts.neutral * 0.3, سلبي: sentimentCounts.negative * 0.3 },
         { date: "اليوم 2", إيجابي: sentimentCounts.positive * 0.4, محايد: sentimentCounts.neutral * 0.4, سلبي: sentimentCounts.negative * 0.4 },

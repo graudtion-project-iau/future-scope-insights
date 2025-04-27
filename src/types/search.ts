@@ -1,3 +1,4 @@
+
 export interface Tweet {
   id: string;
   text: string;
@@ -25,7 +26,7 @@ export interface Tweet {
   bookmarkCount?: number;
   sentiment: 'positive' | 'neutral' | 'negative';
   media?: {
-    type: 'photo' | 'video';
+    type: 'image' | 'video'; // Changed from 'photo' | 'video' to match TweetCard
     url: string;
     sizes?: {
       large: { h: number; w: number };
@@ -147,6 +148,33 @@ export interface APIAnalysisResponse {
       is_retweet: boolean;
       is_reply: boolean;
       language: string;
+      user?: {
+        username: string;
+        full_name: string;
+        profile_image: string;
+        verified: boolean;
+        followers_count: number;
+        description: string;
+        location: string;
+        created_at: string;
+        statuses_count: number;
+        favorites_count: number;
+        media_count: number;
+      };
+      tweet?: {
+        view_count?: number;
+        bookmark_count?: number;
+        source?: string;
+      };
+      media?: {
+        media_url_https: string;
+        type: 'photo' | 'video';
+        sizes?: {
+          large: { h: number; w: number };
+          medium: { h: number; w: number };
+          small: { h: number; w: number };
+        };
+      }[];
     };
   }>;
   percentages: {

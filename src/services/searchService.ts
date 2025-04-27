@@ -225,8 +225,8 @@ const transformTweetsResponse = (tweets: any): TweetSearchResults => {
       replies: tweet.replies || (tweet.engagement_metrics?.replies || 0),
       sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
       media: tweet.media ? tweet.media.map((m: any) => ({
-        type: (m.type || 'image') as 'image' | 'video',
-        url: m.url || ''
+        type: (m.type === 'photo' ? 'image' : 'video') as 'image' | 'video',
+        url: m.url || m.media_url_https || ''
       })) : undefined
     }))
   };
