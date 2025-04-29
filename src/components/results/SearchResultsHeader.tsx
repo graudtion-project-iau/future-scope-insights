@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Filter } from 'lucide-react';
@@ -26,7 +25,7 @@ const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
           <h1 className="text-2xl font-bold mb-2">نتائج البحث</h1>
           <p className="text-gray-600">{query ? `استعلام: "${query}"` : 'استخدم شريط البحث للحصول على تحليلات'}</p>
         </div>
-        <SearchBar onSearch={onSearch} />
+        <SearchBar onSearch={onSearch} tweetCount={total} />
         
         {query && total && (
           <div className="flex justify-between items-center mt-4 flex-wrap gap-2">

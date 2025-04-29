@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Globe, Bell, LogIn } from 'lucide-react';
@@ -43,24 +42,8 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0 flex items-center">
-                <span className="text-saudi-green text-2xl font-bold tracking-tight">Future</span>
+                <span className="text-saudi-green text-2xl font-bold tracking-tight">Futvi</span>
               </Link>
-              <div className="hidden md:block">
-                <div className={`ml-10 flex items-baseline space-x-4 ${language === 'ar' ? 'space-x-reverse' : ''}`}>
-                  <Link to="/" className="text-gray-700 hover:text-saudi-green px-3 py-2 rounded-md text-sm font-medium">
-                    {t('nav.home')}
-                  </Link>
-                  <Link to="/results" className="text-gray-700 hover:text-saudi-green px-3 py-2 rounded-md text-sm font-medium">
-                    {t('nav.reports')}
-                  </Link>
-                  <Link to="/" className="text-gray-700 hover:text-saudi-green px-3 py-2 rounded-md text-sm font-medium">
-                    {t('nav.features')}
-                  </Link>
-                  <Link to="/" className="text-gray-700 hover:text-saudi-green px-3 py-2 rounded-md text-sm font-medium">
-                    {t('nav.pricing')}
-                  </Link>
-                </div>
-              </div>
             </div>
             <div className="hidden md:block">
               <div className={`ml-4 flex items-center md:ml-6 space-x-3 ${language === 'ar' ? 'space-x-reverse' : ''}`}>

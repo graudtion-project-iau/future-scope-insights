@@ -1,235 +1,323 @@
 import { get, post } from "@/api/apiClient";
 import API_ENDPOINTS from "@/api/apiUrls";
 import { SearchProgress } from "@/utils/searchStages";
-import { AnalysisOverviewData, TweetSearchResults, APIAnalysisResponse } from "@/types/search";
-import { transformAnalysisData } from "@/utils/analysisTransformers";
+import { AnalysisOverviewData, TweetSearchResults, APIAnalysisResponse, Tweet } from "@/types/search";
+import axios from 'axios';
+import { SearchQuery, AnalysisResult } from '@/types/search';
 
-/**
- * Function to execute a search in three phases:
- * 1. Initial search to get a search ID
- * 2. Analysis phase
- * 3. Dashboard preparation
- * 
- * @param query The search query
- * @param onProgress Callback to receive progress updates
- */
-export const executeSearch = async (
-  query: string,
-  onProgress: (progress: SearchProgress) => void
-): Promise<{
-  searchId: string;
-  analysisData: AnalysisOverviewData | null;
-  tweetsData: TweetSearchResults | null;
-}> => {
+const logApi = async (label: string, fn: () => Promise<any>) => {
+  console.log(`[API] ${label} - START`);
+  const result = await fn();
+  console.log(`[API] ${label} - RESULT:`, result);
+  return result;
+};
+
+const sentimentToArabic = (sentiment: string) => {
+  if (sentiment === 'positive') return 'إيجابي';
+  if (sentiment === 'negative') return 'سلبي';
+  return 'محايد';
+};
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.futvi.com';
+
+export const createSearchQuery = async (query: string, maxItems: number = 5): Promise<{ id: number }> => {
+  const response = await axios.post(`${API_BASE_URL}/api/searchqueries/`, {
+    query,
+    search_type: "twitter",
+    parameters: { maxItems, sort: "Top" },
+    status: "pending"
+  });
+  return response.data;
+};
+
+export const startCollection = async (queryId: number): Promise<{ status: string; message: string; next_stage: string }> => {
+  const response = await axios.post(`${API_BASE_URL}/api/searchqueries/${queryId}/start_collection/`);
+  return response.data;
+};
+
+export const collectTweets = async (queryId: number): Promise<{ status: string; message: string; next_stage: string }> => {
+  const response = await axios.post(`${API_BASE_URL}/api/searchqueries/${queryId}/collect_tweets/`);
+  return response.data;
+};
+
+export const analyzeTweets = async (queryId: number): Promise<any> => {
+  const response = await axios.post(`${API_BASE_URL}/api/searchqueries/${queryId}/analyze_tweets/`);
+  return response.data;
+};
+
+export const getSearchResults = async (queryId: number): Promise<any> => {
   try {
-    // Phase 1: Initial search - create search query
-    onProgress({
-      stage: 'searching',
-      progress: 10,
-      message: 'بدء البحث وجمع التغريدات'
-    });
-    
-    // Call the create search query endpoint with maxItems: 5
-    const searchQueryParams = {
-      query: query,
-      search_type: "twitter",
-      parameters: {
-        maxItems: 5,
-        sort: "Top"
-      },
-      status: "pending"
-    };
-    
-    const searchResponse = await post<{
-      id: number;
-      query: string;
-      status: string;
-    }>(`${API_ENDPOINTS.search.query}`, searchQueryParams);
-    
-    if (!searchResponse?.id) {
-      throw new Error('فشل في بدء عملية البحث');
-    }
-    
-    const searchId = searchResponse.id.toString();
-    
-    onProgress({
-      stage: 'searching',
-      progress: 25,
-      message: 'تم بدء البحث بنجاح',
-      searchId
-    });
-    
-    // Start collection
-    await post(`${API_ENDPOINTS.search.status}${searchId}/start_collection/`, {});
-    
-    // Collect tweets
-    await post(`${API_ENDPOINTS.search.status}${searchId}/collect_tweets/`, {});
-    
-    // Poll for search status until completed
-    let searchCompleted = false;
-    let attempts = 0;
-    const maxAttempts = 20;
-    
-    while (!searchCompleted && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const statusResponse = await get<{
-        status: string;
-        progress: number;
-      }>(`${API_ENDPOINTS.search.status}${searchId}/`);
-      
-      if (statusResponse?.status === "completed") {
-        searchCompleted = true;
-      } else {
-        attempts++;
-        onProgress({
-          stage: 'searching',
-          progress: 25 + Math.min((attempts / maxAttempts) * 10, 10),
-          message: 'جاري جمع التغريدات...',
-          searchId
-        });
-      }
-    }
-    
-    // Phase 2: Analysis
-    onProgress({
-      stage: 'analyzing',
-      progress: 40,
-      message: 'بدء تحليل النتائج',
-      searchId
-    });
-    
-    // Start analysis
-    await post(`${API_ENDPOINTS.search.status}${searchId}/analyze_tweets/`, {});
-    
-    // Poll for analysis status
-    let analysisCompleted = false;
-    attempts = 0;
-    
-    while (!analysisCompleted && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const analysisStatusResponse = await get<{
-        status: string;
-      }>(`${API_ENDPOINTS.search.status}${searchId}/`);
-      
-      if (analysisStatusResponse?.status === "analysis_completed" || 
-          analysisStatusResponse?.status === "completed") {
-        analysisCompleted = true;
-      } else {
-        attempts++;
-        onProgress({
-          stage: 'analyzing',
-          progress: 40 + Math.min((attempts / maxAttempts) * 25, 25),
-          message: 'جاري تحليل المشاعر والمحتوى...',
-          searchId
-        });
-      }
-    }
-    
-    // Phase 3: Report preparation
-    onProgress({
-      stage: 'preparing',
-      progress: 70,
-      message: 'إعداد التقرير النهائي',
-      searchId
-    });
-    
-    // Simulate preparation time
-    for (let progress = 75; progress <= 90; progress += 5) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      onProgress({
-        stage: 'preparing',
-        progress,
-        message: 'جاري إعداد البيانات والرسوم البيانية',
-        searchId
-      });
-    }
-    
-    // Get final results - tweets
-    const tweetsResponse = await get<any[]>(`${API_ENDPOINTS.analysis.tweets}?search_query=${searchId}`);
-    
-    // Get final results - analysis
-    const analysisResponse = await get<APIAnalysisResponse[]>(`${API_ENDPOINTS.analysis.overview}?search_query=${searchId}`);
-    
-    // Transform API response to our app's data format
-    const tweetsData = transformTweetsResponse(tweetsResponse || []);
-    
-    let analysisData = null;
-    if (analysisResponse && analysisResponse.length > 0) {
-      analysisData = transformAnalysisData(analysisResponse[0]);
-    }
-    
-    // Complete
-    onProgress({
-      stage: 'completed',
-      progress: 100,
-      message: 'اكتمل التحليل',
-      searchId
-    });
+    const [tweetsResponse, analysisResponse] = await Promise.all([
+      axios.get(`${API_BASE_URL}/api/tweets/?search_query=${queryId}`),
+      axios.get(`${API_BASE_URL}/api/analysis/?search_query=${queryId}`)
+    ]);
     
     return {
-      searchId,
-      analysisData,
-      tweetsData
+      tweets: tweetsResponse.data,
+      analysis: analysisResponse.data[0] || null
     };
   } catch (error) {
-    console.error('Search error:', error);
-    
-    onProgress({
-      stage: 'error',
-      progress: 0,
-      message: 'حدث خطأ في عملية البحث',
-      error: error instanceof Error ? error.message : 'خطأ غير معروف'
-    });
-    
+    console.error('Error getting search results:', error);
     throw error;
   }
 };
 
-/**
- * Transform tweets API response to our app's format
- */
-const transformTweetsResponse = (tweets: any): TweetSearchResults => {
-  // Handle various response formats
-  let tweetsList: any[] = [];
-  
-  if (Array.isArray(tweets)) {
-    tweetsList = tweets;
-  } else if (tweets && typeof tweets === 'object' && 'results' in tweets) {
-    // Type narrowing to ensure TypeScript recognizes 'results' property
-    const tweetsWithResults = tweets as { results: any[] };
-    tweetsList = tweetsWithResults.results || [];
+export const processSearch = async (query: string, maxItems: number = 5): Promise<{ id: number; data: any }> => {
+  try {
+    // Create search query
+    const searchQuery = await createSearchQuery(query, maxItems);
+    
+    // Start collection
+    await startCollection(searchQuery.id);
+    
+    // Collect tweets
+    await collectTweets(searchQuery.id);
+    
+    // Analyze tweets and return the result directly
+    const analysisResult = await analyzeTweets(searchQuery.id);
+    
+    return {
+      id: searchQuery.id,
+      data: analysisResult
+    };
+  } catch (error) {
+    console.error('Error processing search:', error);
+    throw error;
   }
-  
+};
+
+export const executeSearch = async (
+  queryOrId: string,
+  onProgress: (progress: SearchProgress) => void,
+  maxItems: number = 5
+): Promise<{
+  searchId: string;
+  analysisData: any;
+  tweetsData: any;
+}> => {
+  let searchId = '';
+  let isDirectId = false;
+  if (/^\d+$/.test(queryOrId)) {
+    searchId = queryOrId;
+    isDirectId = true;
+  }
+  try {
+    if (!isDirectId) {
+      onProgress({ stage: 'searching', progress: 10, message: 'بدء البحث وجمع التغريدات' });
+      const searchQueryParams = {
+        query: queryOrId,
+        search_type: "twitter",
+        parameters: { maxItems, sort: "Top" },
+        status: "pending"
+      };
+      const searchResponse = await logApi('Create Search', () => post<{ id: string }>(`/api/searchqueries/`, searchQueryParams));
+      if (!searchResponse?.id) throw new Error('فشل في بدء عملية البحث');
+      searchId = searchResponse.id;
+      onProgress({ stage: 'searching', progress: 20, message: 'تم بدء البحث بنجاح', searchId });
+      await logApi('Start Collection', () => post(`/api/searchqueries/${searchId}/start_collection/`, {}));
+      onProgress({ stage: 'searching', progress: 30, message: 'بدء جمع التغريدات', searchId });
+      await logApi('Collect Tweets', () => post(`/api/searchqueries/${searchId}/collect_tweets/`, {}));
+      onProgress({ stage: 'searching', progress: 40, message: 'جاري جمع التغريدات...', searchId });
+      let collectionCompleted = false;
+      let attempts = 0;
+      const maxAttempts = 30;
+      while (!collectionCompleted && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const statusResponse = await logApi('Check Collection Status', () => get<{ status: string }>(`/api/searchqueries/${searchId}/`));
+        if (statusResponse?.status === "completed") {
+          collectionCompleted = true;
+        } else {
+          attempts++;
+          onProgress({ stage: 'searching', progress: 40 + Math.min((attempts / maxAttempts) * 10, 10), message: 'جاري جمع التغريدات...', searchId });
+        }
+      }
+      if (!collectionCompleted) throw new Error('انتهت مهلة جمع التغريدات');
+      onProgress({ stage: 'searching', progress: 50, message: 'تم جمع التغريدات بنجاح', searchId });
+    }
+    // Analyze tweets and use the result directly
+    onProgress({ stage: 'analyzing', progress: 60, message: 'بدء تحليل النتائج', searchId });
+    const analysisResult = await analyzeTweets(parseInt(searchId));
+    onProgress({ stage: 'completed', progress: 100, message: 'اكتمل التحليل', searchId });
+    // Map tweets from detailed_analysis if present
+    let tweetsData = [];
+    if (analysisResult && Array.isArray(analysisResult.detailed_analysis)) {
+      tweetsData = analysisResult.detailed_analysis.map(mapDetailedTweetToTweet);
+    }
+    return { searchId, analysisData: analysisResult, tweetsData };
+  } catch (error) {
+    onProgress({ stage: 'error', progress: 0, message: 'حدث خطأ في عملية البحث', error: error instanceof Error ? error.message : 'خطأ غير معروف' });
+    throw error;
+  }
+};
+
+const transformTweetsResponse = (tweets: any[]): TweetSearchResults => {
   return {
-    total: tweetsList.length,
+    total: tweets.length,
     page: 1,
-    pages: Math.ceil(tweetsList.length / 20),
-    tweets: tweetsList.map(tweet => ({
-      id: tweet.tweet_id || tweet.id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
-      text: tweet.original_text || tweet.text || '',
-      user: {
-        id: tweet.user_id || `user-${Math.random().toString(36).substring(2, 9)}`,
-        name: tweet.user_name || tweet.username || 'Anonymous',
-        username: tweet.username || 'user',
-        profileImage: tweet.profile_image || "https://randomuser.me/api/portraits/men/1.jpg",
-        verified: tweet.verified || false,
-        followers: tweet.followers_count || tweet.followers || 0
-      },
-      date: tweet.tweet_date || tweet.date || tweet.metadata?.tweet_date || new Date().toISOString(),
-      likes: tweet.likes || (tweet.engagement_metrics?.likes || 0),
-      retweets: tweet.retweets || (tweet.engagement_metrics?.retweets || 0),
-      quotes: tweet.quotes || (tweet.engagement_metrics?.quotes || 0),
-      replies: tweet.replies || (tweet.engagement_metrics?.replies || 0),
-      sentiment: (tweet.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
-      media: tweet.media ? tweet.media.map((m: any) => ({
-        type: (m.type === 'photo' ? 'image' : 'video') as 'image' | 'video',
-        url: m.url || m.media_url_https || ''
-      })) : undefined
-    }))
+    pages: Math.ceil(tweets.length / 20),
+    tweets: tweets.map(tweet => {
+      let username = '';
+      let name = '';
+      let tweetUrl = '';
+      if (tweet.raw_data && tweet.raw_data.url) {
+        tweetUrl = tweet.raw_data.url;
+        const match = tweetUrl.match(/x.com\/(.*?)\//) || tweetUrl.match(/twitter.com\/(.*?)\//);
+        if (match && match[1]) {
+          username = match[1];
+          name = match[1];
+        }
+      }
+      let media = [];
+      if (tweet.raw_data && tweet.raw_data.extendedEntities && tweet.raw_data.extendedEntities.media) {
+        media = tweet.raw_data.extendedEntities.media.map((m: any) => ({
+          type: m.type || 'image',
+          url: m.media_url_https || m.url || ''
+        }));
+      } else if (tweet.media) {
+        media = tweet.media.map((m: any) => ({
+          type: m.type || 'image',
+          url: m.media_url_https || m.url || ''
+        }));
+      }
+      return {
+        id: tweet.tweet_id || tweet.id || `tweet-${Math.random().toString(36).substring(2, 9)}`,
+        text: tweet.text || '',
+        user: {
+          id: tweet.user_id || username || `user-${Math.random().toString(36).substring(2, 9)}`,
+          name,
+          username,
+          profileImage: '',
+          verified: tweet.verified || false,
+          followers: tweet.followers_count || 0
+        },
+        date: tweet.date || new Date().toISOString(),
+        likes: tweet.likes || 0,
+        retweets: tweet.retweets || 0,
+        quotes: tweet.quotes || 0,
+        replies: tweet.replies || 0,
+        sentiment: sentimentToArabic(tweet.sentiment),
+        media,
+        tweetUrl
+      };
+    })
   };
 };
+
+const transformAnalysisResponse = (analysis: APIAnalysisResponse, searchId: string): AnalysisOverviewData => {
+  // Build timeline from detailed_analysis
+  let timelineMap: Record<string, { إيجابي: number; سلبي: number; محايد: number }> = {};
+  let sentimentCounts = { إيجابي: 0, سلبي: 0, محايد: 0 };
+  let influencersArr: { name: string; username: string; engagement: number; tweetUrl: string }[] = [];
+  if (Array.isArray(analysis.detailed_analysis)) {
+    for (const d of analysis.detailed_analysis) {
+      const date = d.metadata?.tweet_date ? d.metadata.tweet_date.split('T')[0] : 'unknown';
+      const sentiment = sentimentToArabic(d.sentiment);
+      if (!timelineMap[date]) timelineMap[date] = { إيجابي: 0, سلبي: 0, محايد: 0 };
+      timelineMap[date][sentiment]++;
+      sentimentCounts[sentiment]++;
+      // Influencer calculation
+      const engagement = (d.engagement_metrics?.likes || 0) + (d.engagement_metrics?.retweets || 0) + (d.engagement_metrics?.replies || 0) + (d.engagement_metrics?.quotes || 0);
+      let username = '';
+      let name = '';
+      let tweetUrl = d.metadata?.tweet_url || '';
+      if (tweetUrl) {
+        const match = tweetUrl.match(/x.com\/(.*?)\//) || tweetUrl.match(/twitter.com\/(.*?)\//);
+        if (match && match[1]) {
+          username = match[1];
+          name = match[1];
+        }
+      }
+      influencersArr.push({ name, username, engagement, tweetUrl });
+    }
+  }
+  // Sort influencers by engagement
+  influencersArr = influencersArr.sort((a, b) => b.engagement - a.engagement).slice(0, 5);
+  // Timeline array
+  const timeline = Object.entries(timelineMap).map(([date, counts]) => ({
+    date,
+    إيجابي: counts.إيجابي,
+    سلبي: counts.سلبي,
+    محايد: counts.محايد
+  }));
+  // Pie chart data
+  const sentiment = {
+    positive: sentimentCounts.إيجابي,
+    negative: sentimentCounts.سلبي,
+    neutral: sentimentCounts.محايد
+  };
+  // KPIs (optional, can be extended)
+  const kpis = [
+    { name: "إجمالي التغريدات", value: (analysis.detailed_analysis?.length || 0).toString(), type: "tweets" },
+    { name: "إيجابي", value: sentimentCounts.إيجابي.toString(), type: "sentiment" },
+    { name: "سلبي", value: sentimentCounts.سلبي.toString(), type: "sentiment" },
+    { name: "محايد", value: sentimentCounts.محايد.toString(), type: "sentiment" },
+    { name: "معرف البحث", value: searchId, type: "id" }
+  ];
+  // Highlighted tweets
+  let highlightTweets: any = {};
+  if (Array.isArray(analysis.detailed_analysis) && analysis.detailed_analysis.length > 0) {
+    highlightTweets.earliest = mapDetailedTweetToTweet(analysis.detailed_analysis[0]);
+    highlightTweets.latest = mapDetailedTweetToTweet(analysis.detailed_analysis[analysis.detailed_analysis.length - 1]);
+    highlightTweets.mostLiked = mapDetailedTweetToTweet(
+      analysis.detailed_analysis.reduce((max, curr) => (curr.engagement_metrics?.likes > (max.engagement_metrics?.likes || 0) ? curr : max), analysis.detailed_analysis[0])
+    );
+  }
+  return {
+    query: analysis?.search_query?.toString() || '',
+    total: analysis?.detailed_analysis?.length || 0,
+    sentiment,
+    kpis,
+    timeline,
+    locations: [],
+    keywords: [], // removed from UI
+    influencers: influencersArr.map(i => ({ name: i.name, followers: '', engagement: i.engagement.toString(), image: '', username: i.username, tweetUrl: i.tweetUrl })),
+    hashtags: [],
+    themes: analysis?.themes || [],
+    expertInsights: analysis?.expert_insights || undefined,
+    lastUpdate: analysis?.created_at || '',
+    highlightTweets,
+  };
+};
+
+function mapDetailedTweetToTweet(d: any): Tweet {
+  let username = '';
+  let name = '';
+  let tweetUrl = d.metadata?.tweet_url || '';
+  if (tweetUrl) {
+    const match = tweetUrl.match(/x.com\/(.*?)\//) || tweetUrl.match(/twitter.com\/(.*?)\//);
+    if (match && match[1]) {
+      username = match[1];
+      name = match[1];
+    }
+  }
+  let media = [];
+  if (d.media && Array.isArray(d.media)) {
+    media = d.media.map((m: any) => ({
+      type: m.type || 'image',
+      url: m.media_url_https || m.url || ''
+    }));
+  }
+  return {
+    id: d.tweet_id,
+    text: d.original_text,
+    user: {
+      id: username,
+      name,
+      username,
+      profileImage: '',
+      verified: false,
+      followers: 0
+    },
+    date: d.metadata?.tweet_date || '',
+    likes: d.engagement_metrics?.likes || 0,
+    retweets: d.engagement_metrics?.retweets || 0,
+    quotes: d.engagement_metrics?.quotes || 0,
+    replies: d.engagement_metrics?.replies || 0,
+    sentiment: sentimentToArabic(d.sentiment),
+    media,
+    tweetUrl
+  };
+}
 
 /**
  * Function to handle predefined search for Riyadh Season
@@ -311,7 +399,7 @@ export const executeRiyadhSeasonSearch = async (
     },
     kpis: [
       { name: "متوسط المشاعر", value: "+0.78", change: 15, type: "sentiment", lastUpdate: "قبل 10 دقائق" },
-      { name: "عدد ال��شارات", value: "35,842", change: 25, type: "mentions", lastUpdate: "تحديث مستمر" },
+      { name: "عدد الإشارات", value: "35,842", change: 25, type: "mentions", lastUpdate: "تحديث مستمر" },
       { name: "الموقع الرئيسي", value: "الرياض", type: "location", lastUpdate: "آخر 24 ساعة" },
       { name: "عدد المؤثرين", value: "47", change: 12, type: "influencers", lastUpdate: "آخر 12 ساعة" },
       { name: "الهاشتاقات", value: "64", change: 18, type: "hashtags", lastUpdate: "قبل 4 ساعات" },
@@ -387,7 +475,7 @@ export const executeRiyadhSeasonSearch = async (
       },
       {
         id: "riyadh-2",
-        text: "الأسعار في موسم الري��ض مرتفعة بشكل مبالغ فيه. يجب إعادة النظر في تسعير الفعاليات لتكون في متناول الجميع. #موسم_الرياض",
+        text: "الأسعار في موسم الرياض مرتفعة بشكل مبالغ فيه. يجب إعادة النظر في تسعير الفعاليات لتكون في متناول الجميع. #موسم_الرياض",
         user: {
           id: "user-202",
           name: "خالد السعيد",
@@ -429,7 +517,7 @@ export const executeRiyadhSeasonSearch = async (
       },
       {
         id: "riyadh-4",
-        text: "مواقف السيارات غير ك��فية في منطقة الفعاليات. قضيت أكثر من ساعة للحصول على موقف. نأمل معالجة هذه المشكلة في المواسم القادمة.",
+        text: "مواقف السيارات غير كفية في منطقة الفعاليات. قضيت أكثر من ساعة للحصول على موقف. نأمل معالجة هذه المشكلة في المواسم القادمة.",
         user: {
           id: "user-204",
           name: "فهد العتيبي",
@@ -485,4 +573,16 @@ export const executeRiyadhSeasonSearch = async (
     analysisData: riyadhSeasonData,
     tweetsData: riyadhSeasonTweets
   };
+};
+
+export const searchTweets = async (query: string): Promise<Tweet[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/tweets/search`, {
+      params: { query }
+    });
+    return response.data as Tweet[];
+  } catch (error) {
+    console.error('Error searching tweets:', error);
+    throw error;
+  }
 };

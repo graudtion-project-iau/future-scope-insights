@@ -1,4 +1,3 @@
-
 export interface Tweet {
   id: string;
   text: string;
@@ -9,35 +8,18 @@ export interface Tweet {
     profileImage: string;
     verified: boolean;
     followers: number;
-    description?: string;
-    location?: string;
-    joinDate?: string;
-    tweetsCount?: number;
-    likesCount?: number;
   };
   date: string;
-  url?: string;
-  source?: string;
   likes: number;
   retweets: number;
   quotes: number;
   replies: number;
-  viewCount?: number;
-  bookmarkCount?: number;
-  sentiment: 'positive' | 'neutral' | 'negative';
+  sentiment: 'positive' | 'neutral' | 'negative' | 'إيجابي' | 'سلبي' | 'محايد';
   media?: {
-    type: 'image' | 'video'; // Changed from 'photo' | 'video' to match TweetCard
+    type: 'image' | 'video';
     url: string;
-    sizes?: {
-      large: { h: number; w: number };
-      medium: { h: number; w: number };
-      small: { h: number; w: number };
-    };
   }[];
-  keyPoints?: string[];
-  isRetweet?: boolean;
-  isReply?: boolean;
-  language?: string;
+  tweetUrl?: string;
 }
 
 export interface TweetSearchResults {
@@ -51,7 +33,7 @@ export interface KPIItem {
   name: string;
   value: string;
   change?: number;
-  type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime' | 'engagement';
+  type?: 'sentiment' | 'mentions' | 'location' | 'influencers' | 'hashtags' | 'keywords' | 'traffic' | 'realtime' | 'engagement' | 'id' | 'tweets' | string;
   lastUpdate?: string;
   color?: string;
 }
@@ -148,33 +130,6 @@ export interface APIAnalysisResponse {
       is_retweet: boolean;
       is_reply: boolean;
       language: string;
-      user?: {
-        username: string;
-        full_name: string;
-        profile_image: string;
-        verified: boolean;
-        followers_count: number;
-        description: string;
-        location: string;
-        created_at: string;
-        statuses_count: number;
-        favorites_count: number;
-        media_count: number;
-      };
-      tweet?: {
-        view_count?: number;
-        bookmark_count?: number;
-        source?: string;
-      };
-      media?: {
-        media_url_https: string;
-        type: 'photo' | 'video';
-        sizes?: {
-          large: { h: number; w: number };
-          medium: { h: number; w: number };
-          small: { h: number; w: number };
-        };
-      }[];
     };
   }>;
   percentages: {
@@ -184,4 +139,27 @@ export interface APIAnalysisResponse {
   };
   created_at: string;
   status: string;
+}
+
+export interface SearchQuery {
+  id: number;
+  query: string;
+  search_type: string;
+  parameters: {
+    maxItems: number;
+    sort: string;
+  };
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnalysisResult {
+  id: number;
+  search_query: number;
+  sentiment: string;
+  topics: string[];
+  summary: string;
+  created_at: string;
+  updated_at: string;
 }

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Twitter, Facebook, Instagram, Linkedin, Globe } from 'lucide-react';
@@ -52,10 +51,10 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li className="flex items-center space-x-2 rtl:space-x-reverse">
                 <Globe size={18} />
-                <span className="text-white/80">support@futurevision.sa</span>
+                <span className="text-white/80">hatim@futvi.com</span>
               </li>
               <li className="text-white/80">الرياض، المملكة العربية السعودية</li>
-              <li className="text-white/80">+966 123 456789</li>
+              <li className="text-white/80">+966580405756</li>
             </ul>
           </div>
         </div>
